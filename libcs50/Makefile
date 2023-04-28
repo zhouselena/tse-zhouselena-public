@@ -25,7 +25,7 @@ hashtable.o: hashtable.h set.h hash.h
 hash.o: hash.h
 mem.o: mem.h
 set.o: set.h
-webpage.o:  webpage.h
+webpage.o: webpage.h
 
 .PHONY: clean sourcelist
 

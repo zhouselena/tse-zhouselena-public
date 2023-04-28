@@ -9,12 +9,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "pagedir.h"
+#include "../libcs50/webpage.h"
 
 bool pagedir_init(const char* pageDirectory) {
 
     // Create pathname for .crawler file
-    char* pathname = malloc(strlen(pageDirectory) + strlen(".crawler") + 1);
+    // printf("length: %d\n", strlen(pageDirectory));
+    char* pathname = malloc(strlen(pageDirectory) + strlen("/.crawler") + 2);
     sprintf(pathname, "%s/.crawler", pageDirectory);
 
     // Check if can open file
@@ -33,7 +36,7 @@ bool pagedir_init(const char* pageDirectory) {
 void pagedir_save(const webpage_t* page, const char* pageDirectory, const int docID) {
     
     // construct the pathname for the page file in pageDirectory
-    char* pathname = malloc(strlen(pageDirectory) + sizeof(docID) + 2);
+    char* pathname = malloc(strlen(pageDirectory) + 22);
     sprintf(pathname, "%s/%d", pageDirectory, docID);
 
     // open that file for writing
