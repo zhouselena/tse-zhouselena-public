@@ -1,0 +1,2 @@
+# Write a .gitignore file telling Git to ignore any unnecessary files in this directory
+# (anything not already covered by the top-level .gitignore).
