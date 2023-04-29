@@ -60,19 +60,16 @@ bool set_insert(set_t* set, const char* key, void* item) {
     // make key copy
     char* keyCopy = malloc(strlen(key)+1);
     strcpy(keyCopy, key);
-    void* itemCopy = malloc(sizeof(item)+1);
-    memcpy(itemCopy, item, sizeof(item)+1);
-
+    
     // make sure key doesn't exist
     if (set_find(set, keyCopy) == NULL) {
-      setnode_t* insert = new_setnode(keyCopy, itemCopy);
+      setnode_t* insert = new_setnode(keyCopy, item);
       insert->next = set->head;
       set->head = insert;
       return true;
     }
     else {
       free(keyCopy);
-      free(itemCopy);
     }
   }
   return false;
