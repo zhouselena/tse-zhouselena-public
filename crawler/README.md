@@ -15,9 +15,7 @@ To test valgrind, run `make valgrind` in terminal.
 To test with `testing.sh`, run `make test` in terminal.
 
 ### Usage
-Run crawler with `./crawler seedURL pageDirectory maxDepth` where `seedURL`
-is the website to crawl, `pageDirectory` is an existing empty directory to store
-results in, and `maxDepth` is the number of levels deep to crawl the `seedURL`. '
+Run `./crawler seedURL pageDirectory maxDepth` where `seedURL` is the website to crawl, `pageDirectory` is an existing directory to store data in, and `maxDepth` is the number of levels to crawl `seedURL`.
 
 `crawler` exit code meanings:
 * exit(0): successful crawl, no errors
