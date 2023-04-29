@@ -89,7 +89,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
     }
 
     bag_insert(crawlBag, seedPage);
-    hashtable_insert(seenURLs, seedURL, "");
+    hashtable_insert(seenURLs, seedURL, NULL);
 
     // while bag is not empty, pull a webpage from the bag
     webpage_t* currentPage;
@@ -126,12 +126,13 @@ static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSee
         // if that URL is Internal, insert the webpage into the hashtable
         // if that succeeded, create a webpage_t for it, insert the webpage into the bag
         char* nextURL = normalizeURL(nextPageURL);
-        if (isInternalURL(nextURL)) {
-            if (hashtable_insert(pagesSeen, nextURL, "")) {
-                webpage_t* nextPage = webpage_new(nextURL, webpage_getDepth(page)+1, NULL);
-                bag_insert(pagesToCrawl, nextPage);
-                logr("Inserted", webpage_getDepth(nextPage), webpage_getURL(nextPage));
-            }
+        if (isInternalURL(nextURL) && hashtable_insert(pagesSeen, nextURL, NULL)) {
+            webpage_t* nextPage = webpage_new(nextURL, webpage_getDepth(page)+1, NULL);
+            bag_insert(pagesToCrawl, nextPage);
+            logr("Inserted", webpage_getDepth(nextPage), webpage_getURL(nextPage));
+        }
+        else {
+            free(nextURL);
         }
         // free the URL
         free(nextPageURL);
