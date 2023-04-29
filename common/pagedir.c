@@ -16,8 +16,7 @@
 bool pagedir_init(const char* pageDirectory) {
 
     // Create pathname for .crawler file
-    // printf("length: %d\n", strlen(pageDirectory));
-    char* pathname = malloc(strlen(pageDirectory) + strlen("/.crawler") + 2);
+    char* pathname = calloc(strlen(pageDirectory) + strlen("/.crawler") + 10, 1);
     sprintf(pathname, "%s/.crawler", pageDirectory);
 
     // Check if can open file
@@ -36,11 +35,11 @@ bool pagedir_init(const char* pageDirectory) {
 void pagedir_save(const webpage_t* page, const char* pageDirectory, const int docID) {
     
     // construct the pathname for the page file in pageDirectory
-    char* pathname = malloc(strlen(pageDirectory) + 22);
+    char* pathname = calloc(strlen(pageDirectory)+10, 1);
     sprintf(pathname, "%s/%d", pageDirectory, docID);
 
     // open that file for writing
-    FILE* fp = fopen(pathname, "w");
+    FILE* fp = fopen(pathname, "a+");
 
     // print the URL, depth, and HTML content to the file
     fprintf(fp, "%s\n%d\n%s\n", webpage_getURL(page), webpage_getDepth(page), webpage_getHTML(page));

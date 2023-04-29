@@ -62,7 +62,7 @@ static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageD
 
     // for maxDepth, ensure it is an integer in specified range
     *maxDepth = atoi(argv[3]);
-    if (*maxDepth < 0 || *maxDepth > 10 /*|| (*maxDepth == 0 && strcmp("0", argv[3]) == false)*/) {
+    if (*maxDepth < 0 || *maxDepth > 10 || !strcmp("0", argv[3])) {
         fprintf(stderr, "maxDepth out of range [0, 10]\n");
         exit(2);
     }
@@ -89,7 +89,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
     }
 
     bag_insert(crawlBag, seedPage);
-    hashtable_insert(seenURLs, seedURL, seedPage);
+    hashtable_insert(seenURLs, seedURL, "");
 
     // while bag is not empty, pull a webpage from the bag
     webpage_t* currentPage;
@@ -105,6 +105,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
                 logr("Scanning", webpage_getDepth(currentPage), webpage_getURL(currentPage));
                 pageScan(currentPage, crawlBag, seenURLs);
             }
+            id++;
         }
         // delete that webpage
         webpage_delete(currentPage);
@@ -112,7 +113,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
 
     // delete the hashtable, delete the bag
     hashtable_delete(seenURLs, NULL);
-    bag_delete(crawlBag, NULL);
+    bag_delete(crawlBag, webpage_delete);
 
 }
 
@@ -124,18 +125,18 @@ static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSee
     while((nextPageURL = webpage_getNextURL(page, &pos)) != NULL) {
         // if that URL is Internal, insert the webpage into the hashtable
         // if that succeeded, create a webpage_t for it, insert the webpage into the bag
-        if (isInternalURL(nextPageURL)) {
-            if (hashtable_insert(pagesSeen, nextPageURL, "")) {
-                webpage_t* nextPage = webpage_new(nextPageURL, webpage_getDepth(page)+1, NULL);
+        char* nextURL = normalizeURL(nextPageURL);
+        if (isInternalURL(nextURL)) {
+            if (hashtable_insert(pagesSeen, nextURL, "")) {
+                webpage_t* nextPage = webpage_new(nextURL, webpage_getDepth(page)+1, NULL);
                 bag_insert(pagesToCrawl, nextPage);
-                logr("Webpage inserted", webpage_getDepth(nextPage), webpage_getURL(nextPage));
+                logr("Inserted", webpage_getDepth(nextPage), webpage_getURL(nextPage));
             }
         }
         // free the URL
         free(nextPageURL);
         pos++;
     }
-    free(nextPageURL);
     
 }
 
