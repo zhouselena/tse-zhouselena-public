@@ -3,3 +3,6 @@
 
 # Generated data in pgdir
 pgdir/**
+
+# Crawler
+crawler

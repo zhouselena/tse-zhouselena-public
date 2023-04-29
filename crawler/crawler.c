@@ -1,8 +1,6 @@
 /*
  * crawler.c
- * exit(1): incorrect number of args, caught in main
- * exit(2): incorrect input, caught in parseArgs
- * exit(3): incorrect memory allocation, caught in crawler
+ * 
  *
  * Selena Zhou, CS50 23S
  *
@@ -18,12 +16,21 @@
 #include "../libcs50/set.h"
 #include "../libcs50/mem.h"
 
+/**************** function declarations ****************/
+
 static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageDirectory, int* maxDepth);
 static void crawl(char* seedURL, char* pageDirectory, const int maxDepth);
 static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSeen);
 static void logr(const char *word, const int depth, const char *url);
 static void deleteItem(void* item);
 
+/**************** main ****************/
+/* Calls parseArgs and crawl and exits 0.
+ * 
+ * Only calls if correct number of arguments passed, otherwise exits with code 1.
+ * Other error calls will be caught and exit nonzero by parseArgs and crawl.
+ * If all successful, main exits 0.
+ */
 int main(const int argc, char* argv[]) {
 
     // Check for correct number of arguments
@@ -40,8 +47,22 @@ int main(const int argc, char* argv[]) {
     printf("Crawling %s with depth %d...\n", seedURL, maxDepth);
     crawl(seedURL, pageDirectory, maxDepth);
 
+    // If all successful, exit 0
+    exit(0);
+
 }
 
+/**************** parseArgs ****************/
+/* Given arguments from the command line, extract them into the function parameters.
+ * Return only if successful.
+ * 
+ * For seedURL, normalizes the URL and validates it is an internal URL.
+ * For pageDirectory, calls pagedir_init() and validates if true.
+ * For maxDepth, ensures it is an integer in range [0, 10].
+ * 
+ * If any validation fails, exit with code 2.
+ * Otherwise, return.
+ */
 static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageDirectory, int* maxDepth) {
 
     // for seedURL, normalize the URL and validate it is an internal URL
@@ -70,6 +91,16 @@ static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageD
 
 }
 
+/**************** crawl ****************/
+/* Crawls from the seedURL to maxDepth, and saves pages in the pageDirectory.
+ * 
+ * Initializes hashtable to hold URLs, and initializes bag with seed webpage at depth 0.
+ * While the bag is not empty and not at max depth,
+ *      extracts webpage, fetches HTML, and saves page to pageDirectory.
+ *      calls pageScan to scan the HTML and continue.
+ * If unable to malloc space at for any given variable
+ *      prints to stderr and exits with code 3.
+ */
 static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
 
     // initialize the hashtable and add the seedURL
@@ -118,6 +149,11 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
 
 }
 
+/**************** pageScan ****************/
+/* Given a webpage, scan the given page to extract any links (URLs), ignoring non-internal URLs;
+ * for any URL not already seen before (i.e., not in the hashtable),
+ * add the URL to both the hashtable pages_seen and to the bag pages_to_crawl.
+ */
 static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSeen) {
 
     int pos = 0;
@@ -142,11 +178,17 @@ static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSee
     
 }
 
-// log one word (1-9 chars) about a given url                                   
+/**************** logr ****************/
+/* Helper function to print log messages.
+ * Log one word (1-9 chars) about a given url.
+ */                                
 static void logr(const char *word, const int depth, const char *url) {
     printf("%2d %*s%9s: %s\n", depth, depth, "", word, url);
 }
 
+/**************** deleteItem ****************/
+/* Helper function to free items in hashtable.
+ */
 static void deleteItem(void* item) {
     if (item != NULL) {
         free(item);
