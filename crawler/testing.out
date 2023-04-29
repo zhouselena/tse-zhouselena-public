@@ -7,5 +7,7 @@ _module_raw () {  eval `/usr/bin/tclsh8.6 /usr/lib/x86_64-linux-gnu/modulecmd.tc
  return $_mlstatus
 }
 ./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 2
-free(): double free detected in tcache 2
-testing.sh: line 1: 815687 Aborted                 (core dumped) ./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 2
+Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/ with depth 2...
+ 0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/
+ 0     Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/
+ 0  Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/

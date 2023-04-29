@@ -22,6 +22,7 @@ static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageD
 static void crawl(char* seedURL, char* pageDirectory, const int maxDepth);
 static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSeen);
 static void logr(const char *word, const int depth, const char *url);
+static void deleteItem(void* item);
 
 int main(const int argc, char* argv[]) {
 
@@ -89,7 +90,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
     }
 
     bag_insert(crawlBag, seedPage);
-    hashtable_insert(seenURLs, seedURL, NULL);
+    hashtable_insert(seenURLs, seedURL, "");
 
     // while bag is not empty, pull a webpage from the bag
     webpage_t* currentPage;
@@ -112,7 +113,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
     }
 
     // delete the hashtable, delete the bag
-    hashtable_delete(seenURLs, NULL);
+    hashtable_delete(seenURLs, deleteItem);
     bag_delete(crawlBag, webpage_delete);
 
 }
@@ -126,7 +127,7 @@ static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSee
         // if that URL is Internal, insert the webpage into the hashtable
         // if that succeeded, create a webpage_t for it, insert the webpage into the bag
         char* nextURL = normalizeURL(nextPageURL);
-        if (isInternalURL(nextURL) && hashtable_insert(pagesSeen, nextURL, NULL)) {
+        if (isInternalURL(nextURL) && hashtable_insert(pagesSeen, nextURL, "")) {
             webpage_t* nextPage = webpage_new(nextURL, webpage_getDepth(page)+1, NULL);
             bag_insert(pagesToCrawl, nextPage);
             logr("Inserted", webpage_getDepth(nextPage), webpage_getURL(nextPage));
@@ -144,4 +145,10 @@ static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSee
 // log one word (1-9 chars) about a given url                                   
 static void logr(const char *word, const int depth, const char *url) {
     printf("%2d %*s%9s: %s\n", depth, depth, "", word, url);
+}
+
+static void deleteItem(void* item) {
+    if (item != NULL) {
+        free(item);
+    }
 }
