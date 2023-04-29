@@ -1,6 +1,6 @@
 /*
  * crawler.c
- * 
+ * crawler crawls a website and retrieves webpages starting with a specified URL.
  *
  * Selena Zhou, CS50 23S
  *
