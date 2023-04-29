@@ -1,2 +1,5 @@
-# Write a .gitignore file telling Git to ignore any unnecessary files in this directory
-# (anything not already covered by the top-level .gitignore).
+# .gitignore file for 'crawler' directory
+# Selena Zhou, CS50 23W# pgdir data
+
+# Generated data in pgdir
+./pgdir/
