@@ -23,6 +23,11 @@ Run `./crawler seedURL pageDirectory maxDepth` where `seedURL` is the website to
 * exit(2): incorrect input, caught in parseArgs
 * exit(3): incorrect memory allocation, caught in crawler
 
+### Assumptions
+`make test` assumes directories that already exist and ones that don't:
+* pgdir/letters, pgdir/letters-b, pgdir/toscrape, pgdir/wikipedia are assumed to exist
+* nopenope/ is assumed to not exist
+
 ### Files:
 * `.gitignore`: will ignore data written into `pgdir` directory, and file made by crawler
 * `Makefile`: makes terminal by running command `make crawler` in terminal.

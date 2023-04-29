@@ -22,7 +22,6 @@ static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageD
 static void crawl(char* seedURL, char* pageDirectory, const int maxDepth);
 static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSeen);
 static void logr(const char *word, const int depth, const char *url);
-static void deleteItem(void* item);
 
 /**************** main ****************/
 /* Calls parseArgs and crawl and exits 0.
@@ -46,6 +45,7 @@ int main(const int argc, char* argv[]) {
     parseArgs(argc, argv, &seedURL, &pageDirectory, &maxDepth); // will exit if not correct
     printf("Crawling %s with depth %d...\n", seedURL, maxDepth);
     crawl(seedURL, pageDirectory, maxDepth);
+    free(seedURL);
 
     // If all successful, exit 0
     exit(0);
@@ -66,14 +66,11 @@ int main(const int argc, char* argv[]) {
 static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageDirectory, int* maxDepth) {
 
     // for seedURL, normalize the URL and validate it is an internal URL
-    *seedURL = argv[1];
-    char *URL = normalizeURL(*seedURL);
-    if (URL == NULL || isInternalURL(URL) != true) {
-        free(URL);
+    *seedURL = normalizeURL(argv[1]);
+    if (*seedURL == NULL || isInternalURL(*seedURL) != true) {
         fprintf(stderr, "Not a valid URL\n");
         exit(2);
     }
-    free(URL);
 
     // for pageDirectory, call pagedir_init()
     *pageDirectory = argv[2];
@@ -84,7 +81,7 @@ static void parseArgs(const int argc, char* argv[], char** seedURL, char** pageD
 
     // for maxDepth, ensure it is an integer in specified range
     *maxDepth = atoi(argv[3]);
-    if (*maxDepth < 0 || *maxDepth > 10 || !strcmp("0", argv[3])) {
+    if (*maxDepth < 0 || *maxDepth > 10) {
         fprintf(stderr, "maxDepth out of range [0, 10]\n");
         exit(2);
     }
@@ -144,7 +141,7 @@ static void crawl(char* seed, char* pageDirectory, const int maxDepth) {
     }
 
     // delete the hashtable, delete the bag
-    hashtable_delete(seenURLs, deleteItem);
+    hashtable_delete(seenURLs, NULL);
     bag_delete(crawlBag, webpage_delete);
 
 }
@@ -184,13 +181,4 @@ static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSee
  */                                
 static void logr(const char *word, const int depth, const char *url) {
     printf("%2d %*s%9s: %s\n", depth, depth, "", word, url);
-}
-
-/**************** deleteItem ****************/
-/* Helper function to free items in hashtable.
- */
-static void deleteItem(void* item) {
-    if (item != NULL) {
-        free(item);
-    }
 }
