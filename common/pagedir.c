@@ -39,7 +39,7 @@ void pagedir_save(const webpage_t* page, const char* pageDirectory, const int do
     sprintf(pathname, "%s/%d", pageDirectory, docID);
 
     // open that file for writing
-    FILE* fp = fopen(pathname, "a+");
+    FILE* fp = fopen(pathname, "w+");
 
     // print the URL, depth, and HTML content to the file
     fprintf(fp, "%s\n%d\n%s\n", webpage_getURL(page), webpage_getDepth(page), webpage_getHTML(page));
