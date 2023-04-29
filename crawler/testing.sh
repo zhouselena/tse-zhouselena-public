@@ -1,1 +1,1 @@
-./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 2
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 3

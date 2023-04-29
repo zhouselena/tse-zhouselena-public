@@ -6,8 +6,29 @@ _module_raw () {  eval `/usr/bin/tclsh8.6 /usr/lib/x86_64-linux-gnu/modulecmd.tc
  _mlstatus=$?;
  return $_mlstatus
 }
-./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 2
-Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/ with depth 2...
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 3
+Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/ with depth 3...
  0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/
  0     Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/
  0  Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/
+ 1   Inserted: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+ 1    Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+ 1      Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+ 1   Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/A.html
+ 2    Inserted: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+ 2    Inserted: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+ 2     Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+ 2       Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+ 2    Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/index.html
+ 2     Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+ 2       Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+ 2    Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
+ 3     Inserted: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+ 3     Inserted: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+ 3     Inserted: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+ 3      Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+ 3        Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/E.html
+ 3      Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+ 3        Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/D.html
+ 3      Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
+ 3        Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html

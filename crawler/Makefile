@@ -26,7 +26,7 @@ test: testing.sh
 	bash -v testing.sh >& testing.out
 
 valgrind: crawler #testing.sh
-	$(VALGRIND) ./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 2
+	$(VALGRIND) ./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 3
 
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
