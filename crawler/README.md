@@ -26,7 +26,7 @@ results in, and `maxDepth` is the number of levels deep to crawl the `seedURL`. 
 * exit(3): incorrect memory allocation, caught in crawler
 
 ### Files:
-* `.gitignore`: will ignore data written into `pgdir` directory.
+* `.gitignore`: will ignore data written into `pgdir` directory, and file made by crawler
 * `Makefile`: makes terminal by running command `make crawler` in terminal.
 * `crawler.c`: crawler file, implementation details written in comments.
 * `testing.sh`: testing file
