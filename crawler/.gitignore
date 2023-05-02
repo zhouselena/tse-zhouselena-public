@@ -1,5 +1,5 @@
 # .gitignore file for 'crawler' directory
-# Selena Zhou, CS50 23W# pgdir data
+# Selena Zhou, CS50 23S
 
 # Generated data in pgdir
 pgdir/**

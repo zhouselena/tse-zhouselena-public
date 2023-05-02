@@ -1,0 +1,5 @@
+# .gitignore file for 'indexer' directory
+# Selena Zhou, CS50 23S
+
+indexer
+indextest

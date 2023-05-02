@@ -1,6 +1,6 @@
 # 'crawler' directory for Tiny Search Engine
 
-### Selena Zhou, CS50 23W
+### Selena Zhou, CS50 23S
 
 > `common` and `libcs50` libraries need to be made before running `crawler`.
 

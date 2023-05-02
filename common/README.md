@@ -1,6 +1,6 @@
 # 'common' directory for Tiny Search Engine
 
-### Selena Zhou, CS50 23W
+### Selena Zhou, CS50 23S
 
 > This directory needs to be made before running `crawler`.
 
