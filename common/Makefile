@@ -5,7 +5,7 @@
 #
 # Selena Zhou, 23S
 
-OBJS = pagedir.o
+OBJS = pagedir.o word.o index.o
 LIB = common.a
 
 CFLAGS = -Wall -pedantic -std=c11 -ggdb $(FLAGS)
@@ -16,6 +16,8 @@ $(LIB): $(OBJS)
 	ar cr $(LIB) $(OBJS)
 
 pagedir.o: pagedir.h ../libcs50/webpage.h ../libcs50/mem.h
+word.o: word.h
+index.o: index.h ../libcs50/hashtable.h ../libcs50/counters.h ../libcs50/file.h
 
 .PHONY: all clean
 

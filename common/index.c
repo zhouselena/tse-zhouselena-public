@@ -13,10 +13,11 @@
 #include <stdbool.h>
 #include "../libcs50/hashtable.h"
 #include "../libcs50/counters.h"
+#include "../libcs50/file.h"
 
 /**************** global types ****************/
 
-typedef struct index index_t {
+typedef struct index {
     int num_slots;
     hashtable_t* table;
 } index_t;
@@ -41,22 +42,22 @@ index_t* index_new(const int num_slots) {
         return NULL;        // memory is improperly allocated
     }
 
+    return dex;
+
 }
 
 void index_add(index_t* dex, char* word, const int docID) {
     
-    if (dex == NULL || word == NULL || docID == NULL) {
+    if (dex == NULL || word == NULL || docID < 0) {
         return;
     }
     
-    hashtable_insert(dex->table, word, NULL);           // adds word to hashtable if not added already
-
     counters_t* currentCounter = hashtable_find(dex->table, word);
 
     if (currentCounter == NULL) {       // first occurence of the word
         counters_t* newCounter = counters_new();
         counters_add(newCounter, docID);
-        hashtable_insert(dex->table, newCounter);
+        hashtable_insert(dex->table, word, newCounter);
         // create a new slot in the hashtable with the word as the key
         // add a new counter in that slot
     } else {
@@ -67,7 +68,7 @@ void index_add(index_t* dex, char* word, const int docID) {
 
 void index_set(index_t* dex, char* word, const int docID, const int count) {
     
-    if (dex == NULL || word == NULL || docID == NULL) {
+    if (dex == NULL || word == NULL || docID < 0) {
         return;
     }
 
@@ -78,7 +79,7 @@ void index_set(index_t* dex, char* word, const int docID, const int count) {
     if (currentCounter == NULL) {       // not been added already
         counters_t* newCounter = counters_new();
         counters_set(newCounter, docID, count);
-        hashtable_insert(dex->table, newCounter);
+        hashtable_insert(dex->table, word, newCounter);
         // create a new slot in the hashtable with the word as the key
         // add a new counter in that slot
     } else {
@@ -115,8 +116,8 @@ void hashtable_iterate_helper(void* arg, const char* key, void* item) {
     FILE* fp = arg;                                             // cast to file
     fprintf(fp, "%s", key);                                     // print word
     counters_t* ctrs = item;                                    // cast to counters
-    counters_iterate(ctrs, counter_iterate_helper);
-    fprintf(fp, "\n")                               // add new line after every word
+    counters_iterate(ctrs, fp, (*counter_iterate_helper));
+    fprintf(fp, "\n");                               // add new line after every word
 
 }
 
@@ -124,7 +125,7 @@ bool index_save(index_t* dex, FILE* fp) {
 
     if (dex == NULL || fp == NULL) return false;
 
-    hashtable_iterate(dex->table, fp, hashtable_iterate_helper);
+    hashtable_iterate(dex->table, fp, (*hashtable_iterate_helper));
     return true;
 
 }
@@ -136,7 +137,7 @@ void delete_counter(void *item) {
 
 void index_delete(index_t* dex) {
 
-    hashtable_delete(index->ht, delete_counter);
+    hashtable_delete(dex->table, delete_counter);
     free(dex);
 
 }
