@@ -32,7 +32,7 @@ test: indextest test.names
 	./settest < test.names > testing.out
 
 valgrind: indexer
-	$(VALGRIND) ./indexer ../crawler/pgdir/letters index.out
+	$(VALGRIND) ./indexer ../crawler/pgdir/letters testing.out
 
 clean:
 	rm -rf *.dSYM  # MacOS debugger info

@@ -101,7 +101,7 @@ static void indexBuild(index_t* dex, char* pageDirectory) {
     int docID = 1;
     do {
         
-        pathname  = calloc(strlen(pageDirectory)+10, 1);
+        pathname = malloc(strlen(pageDirectory)+10);
         sprintf(pathname, "%s/%d", pageDirectory, docID);
         fp = fopen(pathname, "r");
 
