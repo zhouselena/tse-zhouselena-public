@@ -14,15 +14,19 @@
 #include <string.h>
 #include "../libcs50/webpage.h"
 #include "../common/pagedir.h"
+#include "../common/word.h"
+#include "../common/index.h"
 #include "../libcs50/bag.h"
 #include "../libcs50/hashtable.h"
 #include "../libcs50/set.h"
+#include "../libcs50/file.h"
+
 
 /**************** function declarations ****************/
 
 static void parseArgs(const int argc, char* argv[], char* pageDirectory, char* indexFileName);
-indexBuild
-indexPage
+static void indexBuild(index_t* dex, char* pageDirectory);
+static void indexPage(index_t* dex, webpage_t* page, const int docID);
 
 /**************** main ****************/
 
@@ -39,7 +43,18 @@ int main(const int argc, char* argv[]) {
     char* indexFileName;
     parseArgs(argc, argv, pageDirectory, indexFileName);
 
-    // If all successful, exit 0
+    // Call indexBuild
+    index_t* dex;
+    indexBuild(dex, pageDirectory);
+
+    // Create new file and print index to the file
+    FILE* fp = fopen(indexFileName, "w");
+    index_save(dex, fp);
+
+    // If all successful, free, exit 0
+    index_delete(dex);
+    free(pageDirectory;
+    free(indexFileName))
     exit(0);
 
 }
@@ -52,5 +67,86 @@ int main(const int argc, char* argv[]) {
  */
 
 static void parseArgs(const int argc, char* argv[], char* pageDirectory, char* indexFileName) {
+
+        // for pageDirectory, call pagedir_init()
+    pageDirectory = argv[1];
+    if (pagedir_init(pageDirectory) != true) {
+        fprintf(stderr, "Not valid page directory\n");
+        exit(2);
+    }
+
+    indexFileName = argv[2];
+    if (indexFileName == NULL) {
+        fprintf(stderr, "Not valid index file name\n");
+        exit(2)
+    }
+
+}
+
+/*where indexBuild:
+
+  creates a new 'index' object
+  loops over document ID numbers, counting from 1
+    loads a webpage from the document file 'pageDirectory/id'
+    if successful, 
+      passes the webpage and docID to indexPage*/
+
+static void indexBuild(index_t* dex, char* pageDirectory) {
+
+    dex = index_new(300);       // hardcoded between 200 and 900
+
+    char* pathname;
+    FILE* fp;
+    
+    int docID = 1;
+    do {
+        
+        pathname  = calloc(strlen(pageDirectory)+10, 1)
+        sprintf(pathname, "%s/%d", pageDirectory, docID);
+        fp = fopen(pathname, "r");
+
+        if (fp == NULL) break;
+
+        char* url = readlinep(fp);
+        char* depth_string = readlinep(fp);
+        char* html = readfilep(fp);
+        int depth = atoi(dept_string);              // cast depth to int
+
+        webpage_t* page = webpage_new(url, depth, html);
+        if (page != NULL) {
+            indexPage(dex, page, docID);
+        }
+
+        free(url);
+        free(depth_string);
+        free(html);
+        free(pathname);
+        docID++;
+
+    } while (fp != NULL);
+
+}
+
+/*where indexPage:
+
+ steps through each word of the webpage,
+   skips trivial words (less than length 3),
+   normalizes the word (converts to lower case),
+   looks up the word in the index,
+     adding the word to the index if needed
+   increments the count of occurrences of this word in this docID*/
+
+static void indexPage(index_t* dex, webpage_t* page, const int docID) {
+
+    char* word;
+    int pos = 0;
+
+    while ((pos = webpage_getNextWord(page, pos, &word)) > 0) {
+
+        nomalizeWord(word);
+        index_add(dex, word, docID);
+        free(word);
+
+    }
 
 }

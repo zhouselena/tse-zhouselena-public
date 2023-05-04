@@ -48,6 +48,8 @@ void index_add(index_t* dex, char* word, const int docID) {
     if (dex == NULL || word == NULL || docID == NULL) {
         return;
     }
+    
+    hashtable_insert(dex->table, word, NULL);           // adds word to hashtable if not added already
 
     counters_t* currentCounter = hashtable_find(dex->table, word);
 
@@ -68,6 +70,8 @@ void index_set(index_t* dex, char* word, const int docID, const int count) {
     if (dex == NULL || word == NULL || docID == NULL) {
         return;
     }
+
+    hashtable_insert(dex->table, word, NULL);           // adds word to hashtable if not added already
 
     counters_t* currentCounter = hashtable_find(dex->table, word);
 
