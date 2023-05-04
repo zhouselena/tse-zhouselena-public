@@ -5,3 +5,9 @@
  * Selena Zhou, CS50 23S
  *
  */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "indexer.c"
+
