@@ -53,8 +53,8 @@ int main(const int argc, char* argv[]) {
 
     // If all successful, free, exit 0
     index_delete(dex);
-    free(pageDirectory;
-    free(indexFileName))
+    free(pageDirectory);
+    free(indexFileName);
     exit(0);
 
 }
@@ -78,7 +78,7 @@ static void parseArgs(const int argc, char* argv[], char* pageDirectory, char* i
     indexFileName = argv[2];
     if (indexFileName == NULL) {
         fprintf(stderr, "Not valid index file name\n");
-        exit(2)
+        exit(2);
     }
 
 }
@@ -101,16 +101,16 @@ static void indexBuild(index_t* dex, char* pageDirectory) {
     int docID = 1;
     do {
         
-        pathname  = calloc(strlen(pageDirectory)+10, 1)
+        pathname  = calloc(strlen(pageDirectory)+10, 1);
         sprintf(pathname, "%s/%d", pageDirectory, docID);
         fp = fopen(pathname, "r");
 
         if (fp == NULL) break;
 
-        char* url = readlinep(fp);
-        char* depth_string = readlinep(fp);
-        char* html = readfilep(fp);
-        int depth = atoi(dept_string);              // cast depth to int
+        char* url = file_readLine(fp);
+        char* depth_string = file_readLine(fp);
+        char* html = file_readLine(fp);
+        int depth = atoi(depth_string);              // cast depth to int
 
         webpage_t* page = webpage_new(url, depth, html);
         if (page != NULL) {
@@ -141,11 +141,12 @@ static void indexPage(index_t* dex, webpage_t* page, const int docID) {
     char* word;
     int pos = 0;
 
-    while ((pos = webpage_getNextWord(page, pos, &word)) > 0) {
+    while ((word = webpage_getNextWord(page, &pos)) != NULL) {
 
-        nomalizeWord(word);
+        normalizeWord(word);
         index_add(dex, word, docID);
         free(word);
+        pos++;
 
     }
 

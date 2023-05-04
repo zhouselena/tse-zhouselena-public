@@ -31,8 +31,8 @@ indexer.o: $L/webpage.h $C/pagedir.h $C/word.h $C/index.h $L/mem.h $L/bag.h $L/h
 test: indextest test.names
 	./settest < test.names > testing.out
 
-valgrind: indextest test.names
-	$(VALGRIND) ./indextest < test.names
+valgrind: indexer
+	$(VALGRIND) ./indexer ../crawler/pgdir/letters index.out
 
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
