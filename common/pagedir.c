@@ -55,3 +55,44 @@ void pagedir_save(const webpage_t* page, const char* pageDirectory, const int do
     free(pathname);
 
 }
+
+bool pagedir_validate(const char* pageDirectory) {
+
+    // Catch null pageDirectory
+    if (pageDirectory == NULL) return false;
+
+    // Make sure pageDirectory exists and is a crawler directory with /.crawler file
+    char* crawlerpathname = malloc(strlen(pageDirectory) + strlen("/.crawler") + 1 + 1);
+    sprintf(crawlerpathname, "%s/.crawler", pageDirectory);
+
+    FILE* crawlerfile = fopen(crawlerpathname, "r");
+    if (crawlerfile == NULL) {
+        fprintf(stderr, "Error: not a crawler directory, no pageDirectory/.crawler file\n");
+        fclose(crawlerfile);
+        free(crawlerpathname);
+        return false;
+    }
+
+    fclose(crawlerfile);
+    free(crawlerpathname);
+
+    // Check if first document exists (docID 1)
+    char* docpathname = malloc(strlen(pageDirectory) + strlen("/1") + 1 + 1);
+    sprintf(docpathname, "%s/1", pageDirectory);
+
+    FILE* docfile = fopen(docpathname, "r");
+    if (docfile == NULL) {
+        fprintf(stderr, "Error: no file with docID 1 in pageDirectory\n");
+        fclose(docfile);
+        free(docpathname);
+        return false;
+    }
+
+    fclose(docfile);
+    free(docpathname);
+
+    return true;
+
+}
+
+// webpage_t* pagedir_load(const char *pageDirectory, int docID);

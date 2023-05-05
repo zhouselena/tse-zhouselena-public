@@ -24,7 +24,7 @@
 
 /**************** function declarations ****************/
 
-static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName);
+// static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName);
 static void indexBuild(index_t** dex, char* pageDirectory);
 static void indexPage(index_t** dex, webpage_t* page, const int docID);
 
@@ -32,16 +32,27 @@ static void indexPage(index_t** dex, webpage_t* page, const int docID);
 
 int main(const int argc, char* argv[]) {
 
+    /*
+     * validate it received exactly two command-line arguments and that
+     * pageDirectory is the pathname for a directory produced by the Crawler, and
+     * indexFilename is the pathname of a file that can be written;
+     */
+
     // Check for correct number of arguments
     if (argc != 3) {
         fprintf(stderr, "Usage: ./indexer pageDirectory indexFilename\n");
         exit(1);
     }
 
-    // Call parseArgs, will exit in parseArgs given invalid input
-    char* pageDirectory;
-    char* indexFileName;
-    parseArgs(argc, argv, &pageDirectory, &indexFileName);
+    // Validates arguments
+    char* pageDirectory = argv[1];
+    char* indexFileName = argv[2];
+    if (pageDirectory == NULL || indexFileName == NULL || !pagedir_validate(pageDirectory)) {
+        fprintf(stderr, "Failed pagedir_validate\n");
+        exit(2);
+    }
+    // parseArgs(argc, argv, &pageDirectory, &indexFileName);
+
 
     // Call indexBuild
     index_t* dex;
@@ -64,28 +75,23 @@ int main(const int argc, char* argv[]) {
 }
 
 /**************** parseArgs ****************/
-/*
- * validate it received exactly two command-line arguments and that
- * pageDirectory is the pathname for a directory produced by the Crawler, and
- * indexFilename is the pathname of a file that can be written;
- */
 
-static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName) {
+// static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName) {
 
-    // for pageDirectory, call pagedir_init()
-    *pageDirectory = argv[1];
-    if (pagedir_init(*pageDirectory) != true) {
-        fprintf(stderr, "Not valid page directory\n");
-        exit(2);
-    }
+//     // for pageDirectory, call pagedir_init()
+//     *pageDirectory = argv[1];
+//     if (pagedir_init(*pageDirectory) != true) {
+//         fprintf(stderr, "Not valid page directory\n");
+//         exit(2);
+//     }
 
-    *indexFileName = argv[2];
-    if (*indexFileName == NULL) {
-        fprintf(stderr, "Not valid index file name\n");
-        exit(2);
-    }
+//     *indexFileName = argv[2];
+//     if (*indexFileName == NULL) {
+//         fprintf(stderr, "Not valid index file name\n");
+//         exit(2);
+//     }
 
-}
+// }
 
 /*where indexBuild:
 
