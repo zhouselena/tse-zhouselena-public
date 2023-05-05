@@ -110,7 +110,6 @@ static void indexPage(index_t** dex, webpage_t* page, const int docID) {
     char* word;
     int pos = 0;
     while ((word = webpage_getNextWord(page, &pos)) != NULL) {
-        // printf("%s, %d\n", word, pos);
         normalizeWord(word);
         index_add(*dex, word, docID);
         free(word);
