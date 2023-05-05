@@ -16,15 +16,15 @@ _module_raw () {  eval `/usr/bin/tclsh8.6 /usr/lib/x86_64-linux-gnu/modulecmd.tc
 Usage: ./crawler seedURL pageDirectory maxDepth
 ./crawler 1
 Usage: ./crawler seedURL pageDirectory maxDepth
-./crawler http://cs50tse.cs.dartmouth.edu/tse/letters pgdir 1 1
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters ../data/pgdir 1 1
 Usage: ./crawler seedURL pageDirectory maxDepth
 
 # seedURL is invalid
-./crawler http://hellohello.ca pgdir 2
+./crawler http://hellohello.ca ../data/pgdir 2
 Not a valid URL
 
 # seedURL is not internal
-./crawler https://www.google.ca/ pgdir 2
+./crawler https://www.google.ca/ ../data/pgdir 2
 Not a valid URL
 
 # pageDirectory does not exist
@@ -33,19 +33,19 @@ Error: could not create nopenope/.crawler
 Not valid page directory
 
 # maxDepth out of range
-./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir 11
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/pgdir 11
 maxDepth out of range [0, 10]
 
 #****** Valid tests ******#
 
 # Letters with uppercase URL before normalizing
-./crawler HTTP://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir/letters 0
+./crawler HTTP://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/pgdir/letters 0
 Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/ with depth 0...
  0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/
  0     Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/
 
 # Letters
-./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ pgdir/letters 6
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/ ../data/pgdir/letters 6
 Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/ with depth 6...
  0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/
  0     Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/
@@ -86,7 +86,7 @@ Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/ with depth 6...
  3      Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
  3        Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
  3     Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
-./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/B.html pgdir/letters-b 3
+./crawler http://cs50tse.cs.dartmouth.edu/tse/letters/B.html ../data/pgdir/letters-b 3
 Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/B.html with depth 3...
  0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
  0     Saved: http://cs50tse.cs.dartmouth.edu/tse/letters/B.html
@@ -124,7 +124,7 @@ Crawling http://cs50tse.cs.dartmouth.edu/tse/letters/B.html with depth 3...
  1   Scanning: http://cs50tse.cs.dartmouth.edu/tse/letters/C.html
 
 # Wikipedia
-./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ pgdir/wikipedia 1
+./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ ../data/pgdir/wikipedia 1
 Crawling http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ with depth 1...
  0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/wikipedia/
  0     Saved: http://cs50tse.cs.dartmouth.edu/tse/wikipedia/
@@ -149,7 +149,7 @@ Crawling http://cs50tse.cs.dartmouth.edu/tse/wikipedia/ with depth 1...
  1      Saved: http://cs50tse.cs.dartmouth.edu/tse/wikipedia/Computer_science.html
 
 # toScrape
-./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ pgdir/toscrape 1
+./crawler http://cs50tse.cs.dartmouth.edu/tse/toscrape/ ../data/pgdir/toscrape 1
 Crawling http://cs50tse.cs.dartmouth.edu/tse/toscrape/ with depth 1...
  0   Fetched: http://cs50tse.cs.dartmouth.edu/tse/toscrape/
  0     Saved: http://cs50tse.cs.dartmouth.edu/tse/toscrape/

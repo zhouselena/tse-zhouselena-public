@@ -25,7 +25,7 @@ Run `./crawler seedURL pageDirectory maxDepth` where `seedURL` is the website to
 
 ### Assumptions
 `make test` assumes directories that already exist and ones that don't:
-* pgdir/letters, pgdir/letters-b, pgdir/toscrape, pgdir/wikipedia are assumed to exist
+* ../data/pgdir/letters, ../data/pgdir/letters-b, ../data/pgdir/toscrape, ../data/pgdir/wikipedia are assumed to exist
 * nopenope/ is assumed to not exist
 
 ### Files:
