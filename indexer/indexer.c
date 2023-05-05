@@ -24,7 +24,6 @@
 
 /**************** function declarations ****************/
 
-// static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName);
 static void indexBuild(index_t** dex, char* pageDirectory);
 static void indexPage(index_t** dex, webpage_t* page, const int docID);
 
@@ -51,8 +50,6 @@ int main(const int argc, char* argv[]) {
         fprintf(stderr, "Failed pagedir_validate\n");
         exit(2);
     }
-    // parseArgs(argc, argv, &pageDirectory, &indexFileName);
-
 
     // Call indexBuild
     index_t* dex;
@@ -74,25 +71,6 @@ int main(const int argc, char* argv[]) {
 
 }
 
-/**************** parseArgs ****************/
-
-// static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName) {
-
-//     // for pageDirectory, call pagedir_init()
-//     *pageDirectory = argv[1];
-//     if (pagedir_init(*pageDirectory) != true) {
-//         fprintf(stderr, "Not valid page directory\n");
-//         exit(2);
-//     }
-
-//     *indexFileName = argv[2];
-//     if (*indexFileName == NULL) {
-//         fprintf(stderr, "Not valid index file name\n");
-//         exit(2);
-//     }
-
-// }
-
 /*where indexBuild:
 
   creates a new 'index' object
@@ -105,39 +83,16 @@ static void indexBuild(index_t** dex, char* pageDirectory) {
 
     *dex = index_new(300);       // hardcoded between 200 and 900
 
-    char* pathname;
-    FILE* fp;
-    
+    webpage_t* page;
     int docID = 1;
-    while (true) {
+    while ((page = pagedir_load(pageDirectory, docID)) != NULL) {
 
-        pathname = malloc(strlen(pageDirectory)+1+1+10);
-        sprintf(pathname, "%s/%d", pageDirectory, docID);
-        fp = fopen(pathname, "r");
-
-        if (fp == NULL) break;
-
-        printf("%s\n", pathname);   // track progress
-
-        char* url = file_readLine(fp);
-        char* depth_string = file_readLine(fp);
-        char* html = file_readLine(fp);
-        int depth = atoi(depth_string);              // cast depth to int
-
-        webpage_t* page = webpage_new(url, depth, NULL);
-        if (page != NULL && webpage_fetch(page) != false) {
-            indexPage(dex, page, docID);
-        }
-
+        printf("%s/%d\n", pageDirectory, docID);   // track progress
+        indexPage(dex, page, docID);
         webpage_delete(page);
-        free(pathname);
-        free(depth_string);
-        free(html);
-        fclose(fp);
         docID++;
 
     }
-    free(pathname);
 
 }
 

@@ -46,6 +46,6 @@ void pagedir_save(const webpage_t* page, const char* pageDirectory, const int do
 
 bool pagedir_validate(const char* pageDirectory);
 
-// webpage_t* pagedir_load(const char *pageDirectory, int docID);
+webpage_t* pagedir_load(const char *pageDirectory, int docID);
 
 #endif // __PAGEDIR_H

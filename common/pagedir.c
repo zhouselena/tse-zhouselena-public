@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include "pagedir.h"
 #include "../libcs50/webpage.h"
+#include "../libcs50/file.h"
 
 bool pagedir_init(const char* pageDirectory) {
 
@@ -95,4 +96,34 @@ bool pagedir_validate(const char* pageDirectory) {
 
 }
 
-// webpage_t* pagedir_load(const char *pageDirectory, int docID);
+webpage_t* pagedir_load(const char *pageDirectory, int docID) {
+
+    if (pageDirectory == NULL || docID < 1) return NULL;
+
+    // Open file
+    char* pathname = malloc(strlen(pageDirectory)+1+1+10);
+    sprintf(pathname, "%s/%d", pageDirectory, docID);
+    FILE* fp = fopen(pathname, "r");
+
+    if (fp == NULL) {
+        free(pathname);
+        return NULL;
+    }
+
+    char* url = file_readLine(fp);
+    char* depth_string = file_readLine(fp);
+    char* html = file_readLine(fp);
+    int depth = atoi(depth_string);              // cast depth to int
+
+    webpage_t* page = webpage_new(url, depth, NULL);
+    if (page == NULL) return NULL;
+    webpage_fetch(page);
+
+    free(pathname);
+    free(depth_string);
+    free(html);
+    fclose(fp);
+
+    return page;
+
+}
