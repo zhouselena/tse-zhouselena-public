@@ -104,9 +104,10 @@ static void indexBuild(index_t** dex, char* pageDirectory) {
     
     int docID = 1;
     while (true) {
-        
+
         pathname = malloc(strlen(pageDirectory)+1+1+10);
         sprintf(pathname, "%s/%d", pageDirectory, docID);
+        printf("%s\n", pathname);   // track progress
         fp = fopen(pathname, "r");
 
         if (fp == NULL) break;
@@ -116,14 +117,15 @@ static void indexBuild(index_t** dex, char* pageDirectory) {
         char* html = file_readLine(fp);
         int depth = atoi(depth_string);              // cast depth to int
 
-        webpage_t* page = webpage_new(url, depth, html);
-        if (page != NULL) {
+        webpage_t* page = webpage_new(url, depth, NULL);
+        if (page != NULL && webpage_fetch(page) != false) {
             indexPage(dex, page, docID);
         }
 
         webpage_delete(page);
         free(pathname);
         free(depth_string);
+        free(html);
         fclose(fp);
         docID++;
 
@@ -145,14 +147,15 @@ static void indexPage(index_t** dex, webpage_t* page, const int docID) {
 
     char* word;
     int pos = 0;
-
+    if (webpage_getHTML(page) == NULL) printf("failed\n");
+    // printf("%s\n", webpage_getHTML(page));
+    // word = webpage_getNextWord(page, &pos);
+    // printf("%s, %d\n", word, pos);
     while ((word = webpage_getNextWord(page, &pos)) != NULL) {
-
+        printf("%s, %d\n", word, pos);
         normalizeWord(word);
         index_add(*dex, word, docID);
         free(word);
-        pos++;
-
     }
 
 }

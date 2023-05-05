@@ -54,12 +54,16 @@ void index_add(index_t* dex, char* word, const int docID) {
     
     counters_t* currentCounter = hashtable_find(dex->table, word);
 
-    if (currentCounter == NULL) {       // first occurence of the word
+    if (currentCounter == NULL) {               // first occurence of word
+        // malloc new key bc the old word will be free'd
+        char* wordCpy = malloc(strlen(word)+1);
+        strcpy(wordCpy, word);
+        // create new counter set
         counters_t* newCounter = counters_new();
+        // start count for docID
         counters_add(newCounter, docID);
-        hashtable_insert(dex->table, word, newCounter);
-        // create a new slot in the hashtable with the word as the key
-        // add a new counter in that slot
+        // create a new slot in the hashtable with the word as the key and add new counterset as value
+        hashtable_insert(dex->table, wordCpy, newCounter);
     } else {
         counters_add(currentCounter, docID);    // increment counter with docID
     }
