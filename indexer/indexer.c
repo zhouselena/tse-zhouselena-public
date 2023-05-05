@@ -24,9 +24,9 @@
 
 /**************** function declarations ****************/
 
-static void parseArgs(const int argc, char* argv[], char* pageDirectory, char* indexFileName);
-static void indexBuild(index_t* dex, char* pageDirectory);
-static void indexPage(index_t* dex, webpage_t* page, const int docID);
+static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName);
+static void indexBuild(index_t** dex, char* pageDirectory);
+static void indexPage(index_t** dex, webpage_t* page, const int docID);
 
 /**************** main ****************/
 
@@ -41,20 +41,24 @@ int main(const int argc, char* argv[]) {
     // Call parseArgs, will exit in parseArgs given invalid input
     char* pageDirectory;
     char* indexFileName;
-    parseArgs(argc, argv, pageDirectory, indexFileName);
+    parseArgs(argc, argv, &pageDirectory, &indexFileName);
 
     // Call indexBuild
     index_t* dex;
-    indexBuild(dex, pageDirectory);
+    indexBuild(&dex, pageDirectory);
 
     // Create new file and print index to the file
     FILE* fp = fopen(indexFileName, "w");
+    if (fp == NULL) {
+        fprintf(stderr, "Unable to create new file\n");
+        exit(1);
+    }
     index_save(dex, fp);
 
     // If all successful, free, exit 0
     index_delete(dex);
-    free(pageDirectory);
-    free(indexFileName);
+    fclose(fp);
+
     exit(0);
 
 }
@@ -66,17 +70,17 @@ int main(const int argc, char* argv[]) {
  * indexFilename is the pathname of a file that can be written;
  */
 
-static void parseArgs(const int argc, char* argv[], char* pageDirectory, char* indexFileName) {
+static void parseArgs(const int argc, char* argv[], char** pageDirectory, char** indexFileName) {
 
-        // for pageDirectory, call pagedir_init()
-    pageDirectory = argv[1];
-    if (pagedir_init(pageDirectory) != true) {
+    // for pageDirectory, call pagedir_init()
+    *pageDirectory = argv[1];
+    if (pagedir_init(*pageDirectory) != true) {
         fprintf(stderr, "Not valid page directory\n");
         exit(2);
     }
 
-    indexFileName = argv[2];
-    if (indexFileName == NULL) {
+    *indexFileName = argv[2];
+    if (*indexFileName == NULL) {
         fprintf(stderr, "Not valid index file name\n");
         exit(2);
     }
@@ -91,17 +95,17 @@ static void parseArgs(const int argc, char* argv[], char* pageDirectory, char* i
     if successful, 
       passes the webpage and docID to indexPage*/
 
-static void indexBuild(index_t* dex, char* pageDirectory) {
+static void indexBuild(index_t** dex, char* pageDirectory) {
 
-    dex = index_new(300);       // hardcoded between 200 and 900
+    *dex = index_new(300);       // hardcoded between 200 and 900
 
     char* pathname;
     FILE* fp;
     
     int docID = 1;
-    do {
+    while (true) {
         
-        pathname = malloc(strlen(pageDirectory)+10);
+        pathname = malloc(strlen(pageDirectory)+1+1+10);
         sprintf(pathname, "%s/%d", pageDirectory, docID);
         fp = fopen(pathname, "r");
 
@@ -117,13 +121,14 @@ static void indexBuild(index_t* dex, char* pageDirectory) {
             indexPage(dex, page, docID);
         }
 
-        free(url);
-        free(depth_string);
-        free(html);
+        webpage_delete(page);
         free(pathname);
+        free(depth_string);
+        fclose(fp);
         docID++;
 
-    } while (fp != NULL);
+    }
+    free(pathname);
 
 }
 
@@ -136,7 +141,7 @@ static void indexBuild(index_t* dex, char* pageDirectory) {
      adding the word to the index if needed
    increments the count of occurrences of this word in this docID*/
 
-static void indexPage(index_t* dex, webpage_t* page, const int docID) {
+static void indexPage(index_t** dex, webpage_t* page, const int docID) {
 
     char* word;
     int pos = 0;
@@ -144,7 +149,7 @@ static void indexPage(index_t* dex, webpage_t* page, const int docID) {
     while ((word = webpage_getNextWord(page, &pos)) != NULL) {
 
         normalizeWord(word);
-        index_add(dex, word, docID);
+        index_add(*dex, word, docID);
         free(word);
         pos++;
 

@@ -1,7 +1,7 @@
 # Makefile for 'indexer' module
 # Selena Zhou, 23S
 
-OBJS = indexer.o indextest.o 
+OBJS = indexer.o indextest.o
 C = ../common
 L = ../libcs50
 LIBS =
@@ -22,7 +22,7 @@ indexer: indexer.o $(LLIBS)
 indextest: indextest.o $(LLIBS)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
-indextest.o: indexer.h
+indextest.o: indexer.c
 
 indexer.o: $L/webpage.h $C/pagedir.h $C/word.h $C/index.h $L/mem.h $L/bag.h $L/hashtable.h $L/set.h $L/counters.h
 
