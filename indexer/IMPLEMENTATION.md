@@ -115,18 +115,18 @@ A program indextest will serve as a unit test for the index module; it reads an 
 
 The indexer, as a complete program, will be tested by building an index from a pageDirectory, and then the resulting index will be validated by running it through the indextest to ensure it can be loaded.
 
-### Implemented tests
+### Implemented tests.
 
 Indexer is tested with:
-* Invalid arguments:
-* 1. No arguments
-* 2. One argument
-* 3. Three or more arguments
-* 4. invalid pageDirectory (non-existent path)
-* 5. invalid pageDirectory (not a crawler directory)
-* 6. invalid indexFile (non-existent path)
-* Valid arguments:
-* * Local directories created by crawler
-* * Directories given in `~/cs50-dev/shared/tse/`
-* * `indextest` runs to validate the resulting index (if no error messages print out, then it works!)
-* * Valgrind is run on both indexer and indextest to ensure no memory leaks or errors.
+Invalid arguments:
+1. No arguments
+2. One argument
+3. Three or more arguments
+4. invalid pageDirectory (non-existent path)
+5. invalid pageDirectory (not a crawler directory)
+6. invalid indexFile (non-existent path)
+Valid arguments:
+* Local directories created by crawler
+* Directories given in `~/cs50-dev/shared/tse/`
+* `indextest` runs to validate the resulting index (if no error messages print out, then it works!)
+* Valgrind is run on both indexer and indextest to ensure no memory leaks or errors.
