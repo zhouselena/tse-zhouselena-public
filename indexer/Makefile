@@ -32,7 +32,7 @@ test: testing.sh
 	bash -v testing.sh >& testing.out
 
 valgrind: indexer
-	$(VALGRIND) ./indexer ../data/pgdir/letters testing.out
+	$(VALGRIND) ./indexer ../data/pgdir/letters ../data/indexer/pgdir-letters-index
 
 # valgrind: indextest
 # 	$(VALGRIND) ./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/it-pgdir-letters-index
