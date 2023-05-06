@@ -43,21 +43,19 @@ void index_add(index_t* dex, char* word, const int docID);
 
 /**************** index_set ****************/
 /* Same mechanics as index_add, except sets the count to specified value.
- * 
  */
 void index_set(index_t* dex, char* word, const int docID, const int count);
 
 /**************** index_load ****************/
 /* Given an empty index and an index file, loads information from file to index.
- * 
  */
 void index_load(index_t* dex, FILE* fp);
 
 /**************** index_save ****************/
 /* Given a created index, formats and prints the index information to the given file.
- * 
+ * Return true if saved successfully.
  */
-void index_save(index_t* dex, FILE* fp);
+bool index_save(index_t* dex, FILE* fp);
 
 /**************** index_delete ****************/
 /* Frees all memory taken by index and deletes the index.

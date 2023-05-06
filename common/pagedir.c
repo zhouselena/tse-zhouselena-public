@@ -75,7 +75,6 @@ bool pagedir_validate(const char* pageDirectory) {
     FILE* crawlerfile = fopen(crawlerpathname, "r");
     if (crawlerfile == NULL) {
         fprintf(stderr, "Error: not a crawler directory, no pageDirectory/.crawler file\n");
-        fclose(crawlerfile);
         free(crawlerpathname);
         return false;
     }
@@ -90,7 +89,6 @@ bool pagedir_validate(const char* pageDirectory) {
     FILE* docfile = fopen(docpathname, "r");
     if (docfile == NULL) {
         fprintf(stderr, "Error: no file with docID 1 in pageDirectory\n");
-        fclose(docfile);
         free(docpathname);
         return false;
     }

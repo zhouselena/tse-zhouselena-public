@@ -139,7 +139,7 @@ void index_load(index_t* dex, FILE* fp) {
 }
 
 /**************** index_save ****************/
-void index_save(index_t* dex, FILE* fp) {
+bool index_save(index_t* dex, FILE* fp) {
 
     if (dex == NULL || fp == NULL) return false;
 
