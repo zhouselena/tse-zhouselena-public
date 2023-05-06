@@ -9,68 +9,25 @@
 
 ## Data structures 
 
-Data structures used:
-index.c
-
-We use two data structures: a 'bag' of pages that need to be crawled, and a 'hashtable' of URLs that we have seen during our crawl.
-Both start empty.
-The size of the hashtable (slots) is impossible to determine in advance, so we use 300.
+`index`: Index is an index holding a hashtable word type (word, (docID, count)) that counts the number of times a word appears in each website. The size of the hashtable (slots) is impossible to determine in advance, so we use 300.
 
 ## Control flow
 
-The Crawler is implemented in one file `crawler.c`, with four functions.
+Indexer is implemented in `indexer.c` with the following functions:
 
 ### main
 
-The `main` function simply calls `parseArgs` and `crawl`, then exits zero.
+The `main` function 
 
-### parseArgs
+### indexBuild
 
-Given arguments from the command line, extract them into the function parameters; return only if successful.
-
-* for `seedURL`, normalize the URL and validate it is an internal URL
-* for `pageDirectory`, call `pagedir_init()`
-* for `maxDepth`, ensure it is an integer in specified range
-* if any trouble is found, print an error to stderr and exit non-zero.
-
-### crawl
-
-Do the real work of crawling from `seedURL` to `maxDepth` and saving pages in `pageDirectory`.
-Pseudocode:
-
-	initialize the hashtable and add the seedURL
-	initialize the bag and add a webpage representing the seedURL at depth 0
-	while bag is not empty
-		pull a webpage from the bag
-		fetch the HTML for that webpage
-		if fetch was successful,
-			save the webpage to pageDirectory
-			if the webpage is not at maxDepth,
-				pageScan that HTML
-		delete that webpage
-	delete the hashtable
-	delete the bag
-
-### pageScan
-
-This function implements the *pagescanner* mentioned in the design.
-Given a `webpage`, scan the given page to extract any links (URLs), ignoring non-internal URLs; for any URL not already seen before (i.e., not in the hashtable), add the URL to both the hashtable `pages_seen` and to the bag `pages_to_crawl`.
-Pseudocode:
-
-	while there is another URL in the page
-		if that URL is Internal,
-			insert the webpage into the hashtable
-			if that succeeded,
-				create a webpage_t for it
-				insert the webpage into the bag
-		free the URL
+### indexPage
 
 ## Other modules
 
 ### pagedir
 
-We create a re-usable module `pagedir.c` to handles the *pagesaver*  mentioned in the design (writing a page to the pageDirectory), and marking it as a Crawler-produced pageDirectory (as required in the spec).
-We chose to write this as a separate module, in `../common`, to encapsulate all the knowledge about how to initialize and validate a pageDirectory, and how to write and read page files, in one place... anticipating future use by the Indexer and Querier.
+Re-usable module `pagedir.c` handles all page-related functions and is in the `../common` directory.
 
 Pseudocode for `pagedir_init`:
 
