@@ -1,9 +1,3 @@
-```
-******************
-* EXTENSION USED *
-******************
-```
-
 # CS50 TSE
 ## Selena Zhou (zhouselena)
 
@@ -15,4 +9,5 @@ There is currently no global make all, please refer to `README.md` files in `cra
 ### Directories:
 * `common`: shared modules, including pagedir
 * `crawler`: crawler directory
+* `indexer`: indexer directory
 * `libcs50`: given libcs50 library
