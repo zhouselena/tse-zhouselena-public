@@ -79,6 +79,7 @@ void index_set(index_t* dex, char* word, const int docID, const int count) {
 
     if (currentCounter == NULL) {       // not been added already
         counters_t* newCounter = counters_new();
+        counters_add(newCounter, docID);
         counters_set(newCounter, docID, count);
         hashtable_insert(dex->table, word, newCounter);
         // create a new slot in the hashtable with the word as the key
@@ -97,7 +98,7 @@ void index_load(index_t* dex, FILE* fp) {
     int docID;
     int count;
     while ((word = file_readWord(fp)) != NULL) {
-        while ((fscanf(fp, "%d %d ", &docID, &count)) != 0) {
+        while ((fscanf(fp, " %d %d", &docID, &count)) == 2) {
             index_set(dex, word, docID, count);
         }
         free(word);
@@ -106,10 +107,8 @@ void index_load(index_t* dex, FILE* fp) {
 }
 
 void counter_iterate_helper(void* arg, const int key, const int count) {
-
     FILE* fp = arg;                                             // cast to file
     fprintf(fp, " %d %d", key, count);
-
 }
 
 void hashtable_iterate_helper(void* arg, const char* key, void* item) {

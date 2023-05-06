@@ -87,7 +87,7 @@ static void indexBuild(index_t** dex, char* pageDirectory) {
     int docID = 1;
     while ((page = pagedir_load(pageDirectory, docID)) != NULL) {
 
-        printf("%s/%d\n", pageDirectory, docID);   // track progress
+        // printf("%s/%d\n", pageDirectory, docID);   // track progress
         indexPage(dex, page, docID);
         webpage_delete(page);
         docID++;

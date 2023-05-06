@@ -28,11 +28,14 @@ indexer.o: $L/webpage.h $C/pagedir.h $C/word.h $C/index.h $L/mem.h $L/bag.h $L/h
 
 .PHONY: test valgrind clean
 
-test: indextest test.names
-	./settest < test.names > testing.out
+test: testing.sh
+	bash -v testing.sh >& testing.out
 
-valgrind: indexer
-	$(VALGRIND) ./indexer ../crawler/pgdir/letters testing.out
+# valgrind: indexer
+# 	$(VALGRIND) ./indexer ../data/pgdir/letters testing.out
+
+valgrind: indextest
+	$(VALGRIND) ./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/it-pgdir-letters-index
 
 clean:
 	rm -rf *.dSYM  # MacOS debugger info

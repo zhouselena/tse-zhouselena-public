@@ -17,8 +17,12 @@ int main(const int argc, char* argv[]) {
         exit(1);
     }
 
-    FILE* oldIndexFile = fopen(argv[1], "r");
-    FILE* newIndexFile = fopen(argv[2], "w");
+    char* oldpathname = argv[1];
+    FILE* oldIndexFile = fopen(oldpathname, "r");
+
+    char* newpathname = argv[2];
+    FILE* newIndexFile = fopen(newpathname, "w");
+
     if (oldIndexFile == NULL || newIndexFile == NULL) {
         fprintf(stderr, "Error opening files\n");
         exit(2);
@@ -32,6 +36,7 @@ int main(const int argc, char* argv[]) {
 
     index_load(dex, oldIndexFile);
     index_save(dex, newIndexFile);
+    index_delete(dex);
     fclose(oldIndexFile);
     fclose(newIndexFile);
     exit(0);                            // exit 0 on success
