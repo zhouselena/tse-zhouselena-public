@@ -10,6 +10,9 @@
 #include <string.h>
 #include <ctype.h>
 
+/**************** functions ****************/
+
+/**************** normalizeWord ****************/
 char* normalizeWord(char* word) {
     
     if (word == NULL) return NULL;

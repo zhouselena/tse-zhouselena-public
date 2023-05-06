@@ -15,6 +15,9 @@
 
 /**************** functions ****************/
 
+/**************** normalizeWord ****************/
+/* Given a valid word, normalizes to lowercase.
+ */
 char* normalizeWord(char* word);
 
 #endif // __WORD_H
