@@ -1,9 +1,9 @@
 /*
  * indexer.c
- * The TSE indexer is a standalone program that
- * reads the document files produced by the TSE crawler,
- * builds an index,
- * and writes that index to a file.
+ * The TSE indexer is a standalone program that reads the document files produced by the TSE crawler,
+ * builds an index, and writes that index to a file.
+ * 
+ * More detailed information on implementation can be found IMPLEMENTATION.md.
  *
  * Selena Zhou, CS50 23S
  *
@@ -30,12 +30,6 @@ static void indexPage(index_t** dex, webpage_t* page, const int docID);
 /**************** main ****************/
 
 int main(const int argc, char* argv[]) {
-
-    /*
-     * validate it received exactly two command-line arguments and that
-     * pageDirectory is the pathname for a directory produced by the Crawler, and
-     * indexFilename is the pathname of a file that can be written;
-     */
 
     // Check for correct number of arguments
     if (argc != 3) {
@@ -71,13 +65,7 @@ int main(const int argc, char* argv[]) {
 
 }
 
-/*where indexBuild:
-
-  creates a new 'index' object
-  loops over document ID numbers, counting from 1
-    loads a webpage from the document file 'pageDirectory/id'
-    if successful, 
-      passes the webpage and docID to indexPage*/
+/**************** indexBuild ****************/
 
 static void indexBuild(index_t** dex, char* pageDirectory) {
 
@@ -96,14 +84,7 @@ static void indexBuild(index_t** dex, char* pageDirectory) {
 
 }
 
-/*where indexPage:
-
- steps through each word of the webpage,
-   skips trivial words (less than length 3),
-   normalizes the word (converts to lower case),
-   looks up the word in the index,
-     adding the word to the index if needed
-   increments the count of occurrences of this word in this docID*/
+/**************** indexPage ****************/
 
 static void indexPage(index_t** dex, webpage_t* page, const int docID) {
 
