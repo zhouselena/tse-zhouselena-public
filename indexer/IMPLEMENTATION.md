@@ -17,100 +17,116 @@ Indexer is implemented in `indexer.c` with the following functions:
 
 ### main
 
-The `main` function 
+The `main` function validates the arguments passed from the command line, then calls indexBuild and index_save. Afterwards, it deletes the index and closes the file before exiting.
 
 ### indexBuild
 
+The `indexBuild` function goes through each page in the pageDirectory until there are no more, loads the page through `pagedir_load`, and calls indexPage. Then it frees the space taken by the page.
+
 ### indexPage
 
+The `indexPage` function goes through each line of the page, normalizes the word, then adds each word to the index and counts how many times the word appears in the page.
+
 ## Other modules
+
+### index
+
+Index is a type used by indexer. More detailed information is in the comments in the header `index.h` file and so will not be repeated here.
 
 ### pagedir
 
 Re-usable module `pagedir.c` handles all page-related functions and is in the `../common` directory.
 
-Pseudocode for `pagedir_init`:
+Pseudocode for `pagedir_validate`:
 
-	construct the pathname for the .crawler file in that directory
-	open the file for writing; on error, return false.
-	close the file and return true.
+	construct the pathname for the crawler file and open the file for reading; on error, return false.
+	then construct the pathname for the first document in the page directory with docID 1,
+	open the file for reading, on error, return false.
+	if all succeeded, return true.
 
 
-Pseudocode for `pagedir_save`:
+Pseudocode for `pagedir_load`:
 
-	construct the pathname for the page file in pageDirectory
-	open that file for writing
-	print the URL
-	print the depth
-	print the contents of the webpage
-	close the file
+	construct pathname for the document in the page directory and open for reading; on error, return false.
+	read the first few lines to get enough information to construct a new webpage, then fetch the HTML for that webpage.
+	return the new webpage.
 
 ### libcs50
 
-We leverage the modules of libcs50, most notably `bag`, `hashtable`, and `webpage`.
+We leverage the modules of libcs50, most notably `bag`, `hashtable`, `file`, and `webpage`.
 See that directory for module interfaces.
 The new `webpage` module allows us to represent pages as `webpage_t` objects, to fetch a page from the Internet, and to scan a (fetched) page for URLs; in that regard, it serves as the *pagefetcher* described in the design.
 Indeed, `webpage_fetch` enforces the 1-second delay for each fetch, so our crawler need not implement that part of the spec.
 
 ## Function prototypes
 
-### crawler
-
-Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's implementation in `crawler.c` and is not repeated here.
+### indexer
 
 ```c
 int main(const int argc, char* argv[]);
-static void parseArgs(const int argc, char* argv[],
-                      char** seedURL, char** pageDirectory, int* maxDepth);
-static void crawl(char* seedURL, char* pageDirectory, const int maxDepth);
-static void pageScan(webpage_t* page, bag_t* pagesToCrawl, hashtable_t* pagesSeen);
+static void indexBuild(index_t** dex, char* pageDirectory);
+static void indexPage(index_t** dex, webpage_t* page, const int docID);
+```
+
+### index
+```c
+typedef struct index index_t;
+index_t* index_new(const int num_slots);
+void index_add(index_t* dex, char* word, const int docID);
+void index_set(index_t* dex, char* word, const int docID, const int count);
+void index_load(index_t* dex, FILE* fp);
+bool index_save(index_t* dex, FILE* fp);
+void index_delete(index_t* dex);
 ```
 
 ### pagedir
 
-Detailed descriptions of each function's interface is provided as a paragraph comment prior to each function's declaration in `pagedir.h` and is not repeated here.
-
 ```c
 bool pagedir_init(const char* pageDirectory);
 void pagedir_save(const webpage_t* page, const char* pageDirectory, const int docID);
+bool pagedir_validate(const char* pageDirectory);
+webpage_t* pagedir_load(const char *pageDirectory, int docID);
 ```
+
+### words
+```c
+char* normalizeWord(char* word);
+```
+
 
 ## Error handling and recovery
 
 All the command-line parameters are rigorously checked before any data structures are allocated or work begins; problems result in a message printed to stderr and a non-zero exit status.
 
-Out-of-memory errors are handled by variants of the `mem_assert` functions, which result in a message printed to stderr and a non-zero exit status.
+Out-of-memory errors are handled by if statements, which result in a message printed to stderr and a non-zero exit status.
 We anticipate out-of-memory errors to be rare and thus allow the program to crash (cleanly) in this way.
 
-All code uses defensive-programming tactics to catch and exit (using variants of the `mem_assert` functions), e.g., if a function receives bad parameters.
-
-That said, certain errors are caught and handled internally: for example, `pagedir_init` returns false if there is any trouble creating the `.crawler` file, allowing the Crawler to decide what to do; the `webpage` module returns false when URLs are not retrievable, and the Crawler does not treat that as a fatal error.
+All code uses defensive-programming tactics to catch and exit e.g., if a function receives bad parameters.
 
 ## Testing plan
 
-Here is an implementation-specific testing plan.
+Test cases are used to validate `indexer` and `indextest`.
 
-### Unit testing
+### Unit testing.
 
-There are only two units (crawler and pagedir).
-The crawler represents the whole system and is covered below.
-The pagedir unit is tiny; it could be tested using a small C 'driver' to invoke its functions with various arguments, but it is likely sufficient to observe its behavior during the system test.
+A program indextest will serve as a unit test for the index module; it reads an index file into the internal index data structure, then writes the index out to a new index file.
 
-### Regression testing
+### Integration testing.
 
-The crawler can take a long time to run on some sites when `maxDepth` is more than 2.
-For routine regression tests, we crawl the `letters` site at moderate depths; save the pageDirectory from one working run to compare (with `diff -r`) against future runs.
+The indexer, as a complete program, will be tested by building an index from a pageDirectory, and then the resulting index will be validated by running it through the indextest to ensure it can be loaded.
 
-> For Lab 4, you are not required to script regression tests, though you may find the technique useful for your own testing/debugging process.
+### Implemented tests
 
-### Integration/system testing
-
-We write a script `testing.sh` that invokes the crawler several times, with a variety of command-line arguments.
-First, a sequence of invocations with erroneous arguments, testing each of the possible mistakes that can be made.
-Second, a run with valgrind over a moderate-sized test case (such as `toscrape` at depth 1).
-Third, runs over all three CS50 websites (`letters` at depths 0,1,2,10, `toscrape` at depths 0,1,2,3, `wikipedia` at depths 0,1,2).
-Run that script with `bash -v testing.sh` so the output of crawler is intermixed with the commands used to invoke the crawler.
-Verify correct behavior by studying the output, and by sampling the files created in the respective pageDirectories.
-
-> For Lab 4, as noted in the assignment, you may submit a smaller test run.
-> Furthermore, we recommend turning off detailed logging output for these tests, as they make `testing.out` rather large!
+Indexer is tested with:
+* Invalid arguments:
+* 1. No arguments
+* 2. One argument
+* 3. Three or more arguments
+* 4. invalid pageDirectory (non-existent path)
+* 5. invalid pageDirectory (not a crawler directory)
+* 6. invalid indexFile (non-existent path)
+* Valid arguments:
+* * Local directories created by crawler
+* * Directories given in `~/cs50-dev/shared/tse/`
+* * `indextest` runs to validate the resulting index (if no error messages print out, then it works!)
+* * Valgrind is run on both indexer and indextest to ensure no memory leaks or errors.
