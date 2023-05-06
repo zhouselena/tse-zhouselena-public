@@ -118,6 +118,7 @@ The indexer, as a complete program, will be tested by building an index from a p
 ### Implemented tests.
 
 Indexer is tested with:
+
 Invalid arguments:
 1. No arguments
 2. One argument
@@ -125,6 +126,7 @@ Invalid arguments:
 4. invalid pageDirectory (non-existent path)
 5. invalid pageDirectory (not a crawler directory)
 6. invalid indexFile (non-existent path)
+
 Valid arguments:
 * Local directories created by crawler
 * Directories given in `~/cs50-dev/shared/tse/`
