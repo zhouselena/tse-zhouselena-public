@@ -23,10 +23,40 @@ typedef struct index {
 } index_t;
 
 /**************** local functions ****************/
+/* These functions are not accessible outside the scope of this file, and therefore not declared in the header file. */
 
+/**************** counter_iterate_helper ****************/
+/* Formats the key and count from counter and prints it out to a file.
+ */
+void counter_iterate_helper(void* arg, const int key, const int count) {
+    FILE* fp = arg;                                             // cast to file
+    fprintf(fp, " %d %d", key, count);
+}
+
+/**************** hashtable_iterate_helper ****************/
+/* Formats the word and prints to file, calls counters_iterate on the word.
+ */
+void hashtable_iterate_helper(void* arg, const char* key, void* item) {
+
+    FILE* fp = arg;                                             // cast to file
+    fprintf(fp, "%s", key);                                     // print word
+    counters_t* ctrs = item;                                    // cast to counters
+    counters_iterate(ctrs, fp, (*counter_iterate_helper));
+    fprintf(fp, "\n");                               // add new line after every word
+
+}
+
+/**************** delete_counter ****************/
+/* Deletes counter item.
+ */
+void delete_counter(void *item) {
+    counters_t* ctr = item;
+    counters_delete(ctr);
+}
 
 /**************** implemented functions ****************/
 
+/**************** index_new ****************/
 index_t* index_new(const int num_slots) {
 
     if (num_slots <= 0) {       // must have at least one slot
@@ -46,6 +76,7 @@ index_t* index_new(const int num_slots) {
 
 }
 
+/**************** index_add ****************/
 void index_add(index_t* dex, char* word, const int docID) {
     
     if (dex == NULL || word == NULL || docID < 0) {
@@ -67,6 +98,7 @@ void index_add(index_t* dex, char* word, const int docID) {
 
 }
 
+/**************** index_set ****************/
 void index_set(index_t* dex, char* word, const int docID, const int count) {
     
     if (dex == NULL || word == NULL || docID < 0) {
@@ -89,7 +121,7 @@ void index_set(index_t* dex, char* word, const int docID, const int count) {
     }
 
 }
-
+/**************** index_load ****************/
 void index_load(index_t* dex, FILE* fp) {
 
     if (dex == NULL || fp == NULL) return;
@@ -106,22 +138,8 @@ void index_load(index_t* dex, FILE* fp) {
 
 }
 
-void counter_iterate_helper(void* arg, const int key, const int count) {
-    FILE* fp = arg;                                             // cast to file
-    fprintf(fp, " %d %d", key, count);
-}
-
-void hashtable_iterate_helper(void* arg, const char* key, void* item) {
-
-    FILE* fp = arg;                                             // cast to file
-    fprintf(fp, "%s", key);                                     // print word
-    counters_t* ctrs = item;                                    // cast to counters
-    counters_iterate(ctrs, fp, (*counter_iterate_helper));
-    fprintf(fp, "\n");                               // add new line after every word
-
-}
-
-bool index_save(index_t* dex, FILE* fp) {
+/**************** index_save ****************/
+void index_save(index_t* dex, FILE* fp) {
 
     if (dex == NULL || fp == NULL) return false;
 
@@ -130,11 +148,7 @@ bool index_save(index_t* dex, FILE* fp) {
 
 }
 
-void delete_counter(void *item) {
-    counters_t* ctr = item;
-    counters_delete(ctr);
-}
-
+/**************** index_delete ****************/
 void index_delete(index_t* dex) {
 
     hashtable_delete(dex->table, delete_counter);
