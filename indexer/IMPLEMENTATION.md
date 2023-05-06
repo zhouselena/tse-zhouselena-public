@@ -117,8 +117,6 @@ The indexer, as a complete program, will be tested by building an index from a p
 
 ### Implemented tests.
 
-Indexer is tested with:
-
 Invalid arguments:
 1. No arguments
 2. One argument
