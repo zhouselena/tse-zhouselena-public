@@ -2,7 +2,7 @@
 
 ### Selena Zhou, CS50 23S
 
-> This directory needs to be made before running `crawler`.
+> This directory is required for `crawler`, `indexer`, and `querier`.
 
 To make, run `make` in terminal.
 
