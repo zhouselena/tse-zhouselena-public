@@ -44,8 +44,17 @@ bool pagedir_init(const char* pageDirectory);
  */
 void pagedir_save(const webpage_t* page, const char* pageDirectory, const int docID);
 
+
+/**************** pagedir_validate ****************/
+/* Checks that the page directory is a valid directory with the .crawler file,
+ * and checks that the first document exists.
+ * Returns true if both succeed.
+ */
 bool pagedir_validate(const char* pageDirectory);
 
+/**************** pagedir_load ****************/
+/* Given the page directory and docID, opens the doc and creates a new webpage from the information.
+ */
 webpage_t* pagedir_load(const char *pageDirectory, int docID);
 
 #endif // __PAGEDIR_H

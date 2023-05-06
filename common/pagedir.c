@@ -14,6 +14,9 @@
 #include "../libcs50/webpage.h"
 #include "../libcs50/file.h"
 
+/**************** functions ****************/
+
+/**************** pagedir_init ****************/
 bool pagedir_init(const char* pageDirectory) {
 
     // Create pathname for .crawler file
@@ -34,6 +37,8 @@ bool pagedir_init(const char* pageDirectory) {
     return true;
 
 }
+
+/**************** pagedir_save ****************/
 void pagedir_save(const webpage_t* page, const char* pageDirectory, const int docID) {
     
     // construct the pathname for the page file in pageDirectory
@@ -57,6 +62,7 @@ void pagedir_save(const webpage_t* page, const char* pageDirectory, const int do
 
 }
 
+/**************** pagedir_validate ****************/
 bool pagedir_validate(const char* pageDirectory) {
 
     // Catch null pageDirectory
@@ -96,6 +102,7 @@ bool pagedir_validate(const char* pageDirectory) {
 
 }
 
+/**************** pagedir_load ****************/
 webpage_t* pagedir_load(const char *pageDirectory, int docID) {
 
     if (pageDirectory == NULL || docID < 1) return NULL;
