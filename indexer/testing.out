@@ -18,10 +18,10 @@ Usage: ./indexer pageDirectory indexFilename
 Usage: ./indexer pageDirectory indexFilename
 ./indexer ../nonexistent/letters ../data/indexer/pgdir-letters-index # non-existent pageDirectory
 Error: not a crawler directory, no pageDirectory/.crawler file
-testing.sh: line 8: 2993426 Segmentation fault      (core dumped) ./indexer ../nonexistent/letters ../data/indexer/pgdir-letters-index
+Failed pagedir_validate
 ./indexer ../common ../data/indexer/pgdir-letters-index # not a crawler directory
 Error: not a crawler directory, no pageDirectory/.crawler file
-testing.sh: line 9: 2993437 Segmentation fault      (core dumped) ./indexer ../common ../data/indexer/pgdir-letters-index
+Failed pagedir_validate
 ./indexer ../data/pgdir/letters ../data/indexer/broken # non-existent file
 
 # Valid arguments
@@ -31,3 +31,43 @@ testing.sh: line 9: 2993437 Segmentation fault      (core dumped) ./indexer ../c
 ./indexer ~/cs50-dev/shared/tse/output/letters-2 ../data/indexer/letters-2-index
 
 ./indexer ~/cs50-dev/shared/tse/output/toscrape-1 ../data/indexer/toscrape-1-index
+
+./indexer ~/cs50-dev/shared/tse/output/wikipedia_1 ../data/indexer/wikipedia_2-index
+
+# indextest test
+
+./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/IT_pgdir-letters-index
+
+# Valgrind tests
+
+valgrind ./indextest ../data/pgdir/letters ../data/indexer/pgdir-letters-index
+==2999877== Memcheck, a memory error detector
+==2999877== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2999877== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2999877== Command: ./indextest ../data/pgdir/letters ../data/indexer/pgdir-letters-index
+==2999877== 
+==2999877== 
+==2999877== HEAP SUMMARY:
+==2999877==     in use at exit: 0 bytes in 0 blocks
+==2999877==   total heap usage: 307 allocs, 307 frees, 14,049 bytes allocated
+==2999877== 
+==2999877== All heap blocks were freed -- no leaks are possible
+==2999877== 
+==2999877== For lists of detected and suppressed errors, rerun with: -s
+==2999877== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+valgrind ./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/it-pgdir-letters-index
+==2999901== Memcheck, a memory error detector
+==2999901== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==2999901== Using Valgrind-3.18.1 and LibVEX; rerun with -h for copyright info
+==2999901== Command: ./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/it-pgdir-letters-index
+==2999901== 
+==2999901== 
+==2999901== HEAP SUMMARY:
+==2999901==     in use at exit: 0 bytes in 0 blocks
+==2999901==   total heap usage: 307 allocs, 307 frees, 14,049 bytes allocated
+==2999901== 
+==2999901== All heap blocks were freed -- no leaks are possible
+==2999901== 
+==2999901== For lists of detected and suppressed errors, rerun with: -s
+==2999901== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
