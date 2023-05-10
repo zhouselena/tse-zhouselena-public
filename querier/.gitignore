@@ -1,0 +1,7 @@
+# .gitignore file for 'querier' directory
+# Selena Zhou, CS50 23S
+
+querier
+
+# core dumps
+core
