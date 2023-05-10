@@ -53,7 +53,7 @@ int main(const int argc, char* argv[]) {
     FILE* fp = fopen(indexFileName, "w");
     if (fp == NULL) {
         fprintf(stderr, "Unable to create new file\n");
-        exit(1);
+        exit(3);
     }
     index_save(dex, fp);
 
