@@ -14,13 +14,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../libcs50/webpage.h"
-#include "../common/pagedir.h"
-#include "../common/word.h"
-#include "../common/index.h"
 #include "../libcs50/bag.h"
 #include "../libcs50/hashtable.h"
 #include "../libcs50/set.h"
 #include "../libcs50/file.h"
+#include "../common/pagedir.h"
+#include "../common/word.h"
+#include "../common/index.h"
 
 
 /**************** function declarations ****************/
@@ -38,9 +38,32 @@ int main(const int argc, char* argv[]) {
     // Validates arguments
     char* pageDirectory = argv[1];
     char* indexFileName = argv[2];
-    if (pageDirectory == NULL || indexFileName == NULL || !pagedir_validate(pageDirectory)) { // add validate indexFileName
+    FILE* indexFile;
+    if (pageDirectory == NULL || indexFileName == NULL || !pagedir_validate(pageDirectory)) {
         fprintf(stderr, "Failed pagedir_validate\n");
         exit(2);
+    }
+    if ((indexFile = fopen(indexFileName, "r")) == NULL) {
+        fprintf(stderr, "Unable to open index file\n");
+        exit(2);
+    }
+
+    // Save index
+    index_t* dex = index_new(file_numLines(indexFile));
+    index_load(dex, indexFile);
+    
+    // Read queries
+    char* searchLine;
+
+    while(true) {
+
+        if ((searchLine = file_readLine(stdin)) == NULL) { // mallocs space
+            break;      // end search if EOF
+        }
+
+        printf("%s\n", searchLine);
+        free(searchLine);
+
     }
 
 }

@@ -27,7 +27,7 @@ test: testing.sh
 	bash -v testing.sh >& testing.out
 
 valgrind: querier
-	$(VALGRIND) ./querier pageDirectory indexFileName
+	$(VALGRIND) ./querier ../data/pgdir/letters ../data/indexer/pgdir-letters-index
 
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
