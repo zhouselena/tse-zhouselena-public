@@ -46,6 +46,11 @@ void index_add(index_t* dex, char* word, const int docID);
  */
 void index_set(index_t* dex, char* word, const int docID, const int count);
 
+/**************** index_get ****************/
+/* Gets the counter set of a specific word.
+ */
+counters_t *index_get(index_t *dex, const char *word);
+
 /**************** index_load ****************/
 /* Given an empty index and an index file, loads information from file to index.
  */

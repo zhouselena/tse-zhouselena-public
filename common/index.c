@@ -121,6 +121,13 @@ void index_set(index_t* dex, char* word, const int docID, const int count) {
     }
 
 }
+
+/**************** index_get ****************/
+counters_t* index_get(index_t *dex, const char *word) {
+    counters_t* item = hashtable_find(dex->table, word);
+    return item;
+}
+
 /**************** index_load ****************/
 void index_load(index_t* dex, FILE* fp) {
 
