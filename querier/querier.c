@@ -26,6 +26,8 @@
 /**************** funct declarations ****************/
 
 char* cleanQuery(char* word);
+int numWords(char* query);
+void splitWords(char* query, char** words, int numWords);
 
 /**************** main ****************/
 
@@ -71,7 +73,11 @@ int main(const int argc, char* argv[]) {
         if (cleanedQuery == NULL) {
             continue;
         }
-        printf("Evaluating query: %s\n", cleanedQuery);
+        printf("Evaluating query: '%s'\n", cleanedQuery);
+        // split to an array of words
+        int numwords = numWords(cleanedQuery);
+        char* words[numwords];
+        splitWords(cleanedQuery, words, numwords);
 
         free(cleanedQuery); // frees space
         free(searchLine); // frees space
@@ -97,11 +103,12 @@ char* cleanQuery(char* word) {
     for (int i = 0; i < strlen(word); i++) {
 
         if (isspace(word[i])) {   // encountering a whitespace
-            if (i != 0 && !isspace(word[i-1])) {     // add proper whitespaces
+            // skip leading white spaces, and only add space if next word exists (skips duplicate/trailing whitespaces)
+            if (numbWhiteSpaces != i && isalpha(word[i+1])) {
                 cleanWord[cleanWordIndex] = word[i];
                 cleanWordIndex++;
             }
-            numbWhiteSpaces++;      // skip trailing or duplicate whitespaces
+            numbWhiteSpaces++;
         }
 
         else if (!isalpha(word[i])) {    // encountering a non-alpha character
@@ -123,5 +130,44 @@ char* cleanQuery(char* word) {
     }
     
     return cleanWord;
+
+}
+
+/* numWords */
+/* Takes a cleaned and safe query and returns the number of words in the query.
+ */
+int numWords(char* query) {
+    int numWords = 1; // num words = num spaces + 1
+    for (int i = 0; i < strlen(query); i++) {
+        if (isspace(query[i])) numWords++;
+    }
+    return numWords;
+}
+
+/* splitWords */
+/* Takes a cleaned and safe query and splits into an array of words.
+ */
+void splitWords(char* query, char** words, int numWords) {
+
+    char* start = query;
+    char* end = query;
+
+    for (int i = 0; i < numWords; i++) {
+
+        while(!isalpha(*start)) {   // move start to beginning of word
+            start++;
+        }
+
+        end = start;
+        while(isalpha(*end)) {     // move end to end of word
+            end++;
+        }
+
+        *end = '\0';
+
+        words[i] = start;    // add word to array
+        start = end;        // move pointer to next word
+
+    }
 
 }
