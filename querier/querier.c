@@ -30,6 +30,10 @@ int numWords(char* query);
 void splitWords(char* query, char** words, int numWords);
 int checkQueryLogic(char** words, int numwords);
 void printCleanedQuery(char** words, int numwords);
+int numDocs(char* pageDirectory);
+void countersHelper_addDocID(void* arg, const int key, const int count);
+counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdocs);
+
 
 /**************** main ****************/
 
@@ -92,6 +96,13 @@ int main(const int argc, char* argv[]) {
         }
         printCleanedQuery(words, numwords);   // only print if passes all tests
 
+        // score documents
+        // decide what to print
+        int numdocs = numDocs(pageDirectory);
+        counters_t* scores = calculateScores(dex, words, numwords, numdocs);
+        counters_print(scores, stdout);
+
+        free(scores);
         free(cleanedQuery); // frees space
         free(searchLine); // frees space
 
@@ -233,4 +244,52 @@ void printCleanedQuery(char** words, int numwords) {
         printf(" %s", words[i]);
     }
     printf("\n");
+}
+
+/* numDocs */
+/* counts the number of docs in a crawler directory */
+int numDocs(char* pageDirectory) {
+    int count = 0;
+    char* docName = calloc(strlen(pageDirectory)+3, sizeof(char));
+    int docID = 1;
+    sprintf(docName, "%s/%d", pageDirectory, docID);
+    FILE* fp;
+    while ((fp = fopen(docName, "r")) != NULL) {
+        count++;
+        docID++;
+        sprintf(docName, "%s/%d", pageDirectory, docID);
+    }
+    free(docName);
+    return count;
+}
+
+void countersHelper_addDocID(void* arg, const int key, const int count) {
+    counters_t* scores = arg; // cast arg to scores counter
+    counters_set(scores, key, counters_get(scores, key) + count);
+}
+
+counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdocs) {
+
+    /* Returns a counter with all matching docIDs and their scores
+     * 
+     * Scoring:
+     * Get all counters of one word
+     * Iterate over each docID and add the docID + score to the counter # figure out how to do and/or
+     * Do this for each word
+     * 
+     * Ranking:
+     * 
+     */
+
+    counters_t* scores = counters_new();
+
+    for (int i = 0; i < numwords; i++) {
+
+        counters_t* wordCounter = index_get(dex, words[i]);
+        counters_iterate(wordCounter, scores, countersHelper_addDocID);
+
+    }
+
+    return scores;
+
 }
