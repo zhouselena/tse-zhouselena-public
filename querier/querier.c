@@ -23,7 +23,9 @@
 #include "../common/index.h"
 
 
-/**************** function declarations ****************/
+/**************** funct declarations ****************/
+
+char* cleanQuery(char* word);
 
 /**************** main ****************/
 
@@ -57,15 +59,69 @@ int main(const int argc, char* argv[]) {
 
     while(true) {
 
+        // Prompt for query
+        printf("Query: ");
         if ((searchLine = file_readLine(stdin)) == NULL) { // mallocs space
+            printf("\n");
             break;      // end search if EOF
         }
+        
+        // clean query, print error or print cleaned query
+        char* cleanedQuery = cleanQuery(searchLine);
+        if (cleanedQuery == NULL) {
+            continue;
+        }
+        printf("Evaluating query: %s\n", cleanedQuery);
 
-        printf("%s\n", searchLine);
-        free(searchLine);
+        free(cleanedQuery); // frees space
+        free(searchLine); // frees space
 
     }
 
 }
 
 /**************** functions ****************/
+
+/* cleanQuery */
+/* Takes in a char* word, and removes extra whitespaces or non-alpha characters and 
+ * normalizes the word.
+ * If word is empty, return NULL.
+ * IF USED, NEEDS TO FREE
+ */
+char* cleanQuery(char* word) {
+
+    char* cleanWord = malloc(strlen(word));     // mallocs space
+    int cleanWordIndex = 0;
+    int numbWhiteSpaces = 0;
+
+    for (int i = 0; i < strlen(word); i++) {
+
+        if (isspace(word[i])) {   // encountering a whitespace
+            if (i != 0 && !isspace(word[i-1])) {     // add proper whitespaces
+                cleanWord[cleanWordIndex] = word[i];
+                cleanWordIndex++;
+            }
+            numbWhiteSpaces++;      // skip trailing or duplicate whitespaces
+        }
+
+        else if (!isalpha(word[i])) {    // encountering a non-alpha character
+            printf("Error: bad character '%c' in query.\n", word[i]);
+            free(cleanWord);
+            return NULL;
+        }
+
+        else {  // encountering an alpha character
+            cleanWord[cleanWordIndex] = tolower(word[i]);
+            cleanWordIndex++;
+        }
+
+    }
+
+    if (numbWhiteSpaces == strlen(word)) {
+        printf("Error: empty query.\n");
+        return NULL;
+    }
+    
+    return cleanWord;
+
+}
