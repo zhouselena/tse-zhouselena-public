@@ -28,6 +28,8 @@
 char* cleanQuery(char* word);
 int numWords(char* query);
 void splitWords(char* query, char** words, int numWords);
+int checkQueryLogic(char** words, int numwords);
+void printCleanedQuery(char** words, int numwords);
 
 /**************** main ****************/
 
@@ -70,14 +72,18 @@ int main(const int argc, char* argv[]) {
         
         // clean query, print error or print cleaned query
         char* cleanedQuery = cleanQuery(searchLine);
-        if (cleanedQuery == NULL) {
+        if (cleanedQuery == NULL) {     // invalid query
             continue;
         }
-        printf("Evaluating query: '%s'\n", cleanedQuery);
         // split to an array of words
         int numwords = numWords(cleanedQuery);
         char* words[numwords];
         splitWords(cleanedQuery, words, numwords);
+        // validate logic
+        if (checkQueryLogic(words, numwords) == 1) {     // invalid logic
+            continue;
+        }
+        printCleanedQuery(words, numwords);   // only print if passes all tests
 
         free(cleanedQuery); // frees space
         free(searchLine); // frees space
@@ -170,4 +176,48 @@ void splitWords(char* query, char** words, int numWords) {
 
     }
 
+}
+
+/* checkQueryLogic */
+/* Takes an array of words and checks that and/or logic is correct.
+ * Returns 0 if correct
+ * Returns 1 if incorrect.
+ */
+int checkQueryLogic(char** words, int numwords) {
+
+    // first word can't be and/or
+    if (strcmp(words[0], "and") == 0 || strcmp(words[0], "or") == 0) {
+        printf("Error: '%s' cannot be first\n", words[0]);
+        return 1;
+    }
+    
+    // last word can't be and/or
+    if (strcmp(words[numwords-1], "and") == 0 || strcmp(words[numwords-1], "or") == 0) {
+        printf("Error: '%s' cannot be last\n", words[numwords-1]);
+        return 1;
+    }
+
+    // check for adjacent logic
+    for (int i = 1; i < numwords; i++) {
+        // if current word is and/or
+        if (strcmp(words[i], "and") == 0 || strcmp(words[i], "or") == 0) {
+            // if previous word was also and/or
+            if (strcmp(words[i-1], "and") == 0 || strcmp(words[i-1], "or") == 0 ) {
+                printf("Error: '%s' and '%s' cannot be adjacent\n", words[i-1], words[i]);
+                return 1;
+            }
+        }
+
+    }
+
+    return 0;
+
+}
+
+void printCleanedQuery(char** words, int numwords) {
+    printf("Evaluating query:");
+    for (int i = 0; i < numwords; i++) {
+        printf(" %s", words[i]);
+    }
+    printf("\n");
 }
