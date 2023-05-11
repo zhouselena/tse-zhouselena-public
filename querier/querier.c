@@ -57,6 +57,9 @@ int main(const int argc, char* argv[]) {
     // Save index
     index_t* dex = index_new(file_numLines(indexFile));
     index_load(dex, indexFile);
+    FILE* fp = fopen("./testing", "");
+    index_save(dex, fp);
+    fclose(indexFile);
     
     // Read queries
     char* searchLine;
@@ -73,6 +76,8 @@ int main(const int argc, char* argv[]) {
         // clean query, print error or print cleaned query
         char* cleanedQuery = cleanQuery(searchLine);
         if (cleanedQuery == NULL) {     // invalid query
+            free(cleanedQuery);
+            free(searchLine);
             continue;
         }
         // split to an array of words
@@ -81,6 +86,8 @@ int main(const int argc, char* argv[]) {
         splitWords(cleanedQuery, words, numwords);
         // validate logic
         if (checkQueryLogic(words, numwords) == 1) {     // invalid logic
+            free(cleanedQuery);
+            free(searchLine);
             continue;
         }
         printCleanedQuery(words, numwords);   // only print if passes all tests
@@ -89,6 +96,8 @@ int main(const int argc, char* argv[]) {
         free(searchLine); // frees space
 
     }
+
+    index_delete(dex);
 
 }
 
@@ -102,7 +111,7 @@ int main(const int argc, char* argv[]) {
  */
 char* cleanQuery(char* word) {
 
-    char* cleanWord = malloc(strlen(word));     // mallocs space
+    char* cleanWord = calloc(strlen(word)+2, sizeof(char));     // mallocs space
     int cleanWordIndex = 0;
     int numbWhiteSpaces = 0;
 
@@ -132,6 +141,7 @@ char* cleanQuery(char* word) {
 
     if (numbWhiteSpaces == strlen(word)) {
         printf("Error: empty query.\n");
+        free(cleanWord);
         return NULL;
     }
     
@@ -170,7 +180,7 @@ void splitWords(char* query, char** words, int numWords) {
         }
 
         *end = '\0';
-
+        
         words[i] = start;    // add word to array
         start = end;        // move pointer to next word
 
@@ -214,6 +224,9 @@ int checkQueryLogic(char** words, int numwords) {
 
 }
 
+/* printCleanedQuery */
+/* Given an array of words, print the cleaned query.
+ */
 void printCleanedQuery(char** words, int numwords) {
     printf("Evaluating query:");
     for (int i = 0; i < numwords; i++) {
