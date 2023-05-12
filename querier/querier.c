@@ -302,7 +302,9 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
             }
             counters_t* result = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
             if (freeRightTotal == 1) { counters_delete(rightTotal); }
+            if (totalScoresFree == 1) { counters_delete(totalScores); }
             totalScores = result;
+            freeRightTotal = 1;
             totalScoresFree = 1;
             i++;
         }
