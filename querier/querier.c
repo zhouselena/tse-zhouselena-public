@@ -74,6 +74,11 @@ int main(const int argc, char* argv[]) {
 
     // Save index
     index_t* dex = index_new(file_numLines(indexFile));
+    if (dex == NULL) {
+        fprintf(stderr, "Error loading index.\n");
+        fclose(indexFile);
+        exit(10);
+    }
     index_load(dex, indexFile);
     fclose(indexFile);
     
@@ -296,12 +301,9 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
                 i++;
             }
             counters_t* result = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
-            if (freeRightTotal == 1) {
-                counters_delete(rightTotal);
-            }
+            if (freeRightTotal == 1) { counters_delete(rightTotal); }
             totalScores = result;
-            freeRightTotal = 1;
-            i++;
+            // i++;
         }
         else {  // normal word without and/or in between, default to and
             counters_t* currentWord = index_get(dex, words[i]);
@@ -334,12 +336,13 @@ void countersHelper_wordAndWord(void* arg, const int key, const int count) {
 
 counters_t* wordAndWord(counters_t* firstWord, counters_t* secondWord) {
     counters_t* and = counters_new();
-    twoCounters_t* secondAndResult = malloc(sizeof(twoCounters_t));
-    if (secondAndResult == NULL || and == NULL) return NULL;
-    secondAndResult->first = and;
-    secondAndResult->second = secondWord;
-    counters_iterate(firstWord, secondAndResult, countersHelper_wordAndWord);
-    free(secondAndResult);
+    // twoCounters_t* secondAndResult = malloc(sizeof(twoCounters_t));
+    // if (secondAndResult == NULL || and == NULL) return NULL;
+    // secondAndResult->first = and;
+    // secondAndResult->second = secondWord;
+    twoCounters_t secondAndResult = {and, secondWord};
+    counters_iterate(firstWord, &secondAndResult, countersHelper_wordAndWord);
+    // free(secondAndResult);
     return and;
 }
 
@@ -349,11 +352,11 @@ void countersHelper_normalAdd(void* arg, const int key, const int count) {
 }
 
 counters_t* wordOrWord(counters_t* firstWord, counters_t* secondWord) {
-    counters_t* or = counters_new();
-    if (or == NULL) return NULL;
-    counters_iterate(firstWord, or, countersHelper_normalAdd);
-    counters_iterate(secondWord, or, countersHelper_normalAdd);
-    return or;
+    // counters_t* or = counters_new();
+    // if (or == NULL) return NULL;
+    counters_iterate(firstWord, secondWord, countersHelper_normalAdd);
+    // counters_iterate(secondWord, or, countersHelper_normalAdd);
+    return firstWord;
 }
 
 void countersHelper_calculateNumbScores(void* arg, const int key, const int count) {
