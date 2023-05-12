@@ -32,14 +32,15 @@ typedef struct twoCounters { // for counter_iterate w multiple counters
 
 /**************** function declarations ****************/
 
+/* formatting query */
 char* cleanQuery(char* word);
 int numWords(char* query);
 void splitWords(char* query, char** words, int numWords);
 int checkQueryLogic(char** words, int numwords);
 void printCleanedQuery(char** words, int numwords);
-int numDocs(char* pageDirectory);
+
 void countersHelper_normalAdd(void* arg, const int key, const int count);
-counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdocs);
+counters_t* calculateScores(index_t* dex, char** words, int numwords);
 void countersHelper_calculateNumbScores(void* arg, const int key, const int count);
 int calculateNumbScores(counters_t* scores);
 void countersHelper_printScores(void* arg, const int key, const int count);
@@ -109,11 +110,10 @@ int main(const int argc, char* argv[]) {
 
         // score documents
         // decide what to print
-        int numdocs = numDocs(pageDirectory);
-        counters_t* scores = calculateScores(dex, words, numwords, numdocs);
+        counters_t* scores = calculateScores(dex, words, numwords);
         printScores(scores, pageDirectory);
 
-        free(scores);
+        counters_delete(scores);
         free(cleanedQuery); // frees space
         free(searchLine); // frees space
 
@@ -257,25 +257,7 @@ void printCleanedQuery(char** words, int numwords) {
     printf("\n");
 }
 
-/* numDocs */
-/* counts the number of docs in a crawler directory */
-int numDocs(char* pageDirectory) {
-    int count = 0;
-    char* docName = calloc(strlen(pageDirectory)+12, sizeof(char));
-    int docID = 1;
-    sprintf(docName, "%s/%d", pageDirectory, docID);
-    FILE* fp;
-    while ((fp = fopen(docName, "r")) != NULL) {
-        count++;
-        docID++;
-        sprintf(docName, "%s/%d", pageDirectory, docID);
-        fclose(fp);
-    }
-    free(docName);
-    return count;
-}
-
-counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdocs) {
+counters_t* calculateScores(index_t* dex, char** words, int numwords) {
 
     /* Returns a counter with all matching docIDs and their scores
      * 
@@ -299,28 +281,24 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdoc
         } else if (strcmp(words[i], "or") == 0) {
             i++;
             counters_t* rightTotal = index_get(dex, words[i]);
-            while ((strcmp(words[i+1], "or") != 0) && (i < numwords-2)) {      // while haven't reached another OR or end of words, calculates right side
+            int freeRightTotal = 0;
+            while (((i < numwords-2) && strcmp(words[i+1], "or") != 0)) {      // while haven't reached another OR or end of words, calculates right side
                 if (strcmp(words[i], "and") == 0) {     // skip and
                     i++;
                     continue;
                 }
                 counters_t* currentWord = index_get(dex, words[i]);
-                counters_t* result = wordAndWord(rightTotal, currentWord);
-                rightTotal = result;
-                // free(result);
+                rightTotal = wordAndWord(rightTotal, currentWord);
+                freeRightTotal = 1;
                 i++;
             }
-            counters_t* result = wordOrWord(totalScores, rightTotal);       // once reached end or next OR, add right total to total
-            totalScores = result;
-            // free(rightTotal);
-            // free(result);
+            totalScores = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
+            if (freeRightTotal == 1) counters_delete(rightTotal);
             i++;
         }
         else {  // normal word without and/or in between, default to and
             counters_t* currentWord = index_get(dex, words[i]);
-            counters_t* result = wordAndWord(totalScores, currentWord);
-            totalScores = result;
-            // free(result);
+            totalScores = wordAndWord(totalScores, currentWord);
             i++;
         }
 
@@ -348,11 +326,11 @@ void countersHelper_wordAndWord(void* arg, const int key, const int count) {
 counters_t* wordAndWord(counters_t* firstWord, counters_t* secondWord) {
     counters_t* and = counters_new();
     twoCounters_t* secondAndResult = malloc(sizeof(twoCounters_t));
-    if (secondAndResult == NULL) return NULL;
+    if (secondAndResult == NULL || and == NULL) return NULL;
     secondAndResult->first = and;
     secondAndResult->second = secondWord;
     counters_iterate(firstWord, secondAndResult, countersHelper_wordAndWord);
-    // free(secondAndResult);
+    free(secondAndResult);
     return and;
 }
 
@@ -363,6 +341,7 @@ void countersHelper_normalAdd(void* arg, const int key, const int count) {
 
 counters_t* wordOrWord(counters_t* firstWord, counters_t* secondWord) {
     counters_t* or = counters_new();
+    if (or == NULL) return NULL;
     counters_iterate(firstWord, or, countersHelper_normalAdd);
     counters_iterate(secondWord, or, countersHelper_normalAdd);
     return or;
