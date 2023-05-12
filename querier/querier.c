@@ -29,6 +29,11 @@ typedef struct twoCounters { // for counter_iterate w multiple counters
     counters_t* second;
 } twoCounters_t;
 
+typedef struct countersAndInt { // for counter_iterate w multiple counters
+    counters_t* counter;
+    int* intKey;
+} countersAndInt_t;
+
 
 /**************** function declarations ****************/
 
@@ -43,11 +48,12 @@ void countersHelper_normalAdd(void* arg, const int key, const int count);
 counters_t* calculateScores(index_t* dex, char** words, int numwords);
 void countersHelper_calculateNumbScores(void* arg, const int key, const int count);
 int calculateNumbScores(counters_t* scores);
-void countersHelper_printScores(void* arg, const int key, const int count);
+void countersHelper_printScores(char* pageDirectory, const int key, const int count);
 void printScores(counters_t* scores, char* pageDirectory);
 void countersHelper_wordAndWord(void* arg, const int key, const int count);
 counters_t* wordAndWord(counters_t* firstWord, counters_t* secondWord);
 counters_t* wordOrWord(counters_t* firstWord, counters_t* secondWord);
+void countersHelper_findMax(void* arg, const int key, const int count);
 
 /**************** main ****************/
 
@@ -77,7 +83,7 @@ int main(const int argc, char* argv[]) {
     if (dex == NULL) {
         fprintf(stderr, "Error loading index.\n");
         fclose(indexFile);
-        exit(10);
+        exit(3);
     }
     index_load(dex, indexFile);
     fclose(indexFile);
@@ -366,19 +372,31 @@ int calculateNumbScores(counters_t* scores) {
     return numscores;
 }
 
-void countersHelper_printScores(void* arg, const int key, const int count) {
-    char* pageDirectory = arg; // cast to string
+void countersHelper_printScores(char* pageDirectory, const int key, const int count) {
     char* docpathname = malloc(strlen(pageDirectory) + 12);
     sprintf(docpathname, "%s/%d", pageDirectory, key);
     printf("score %*d doc %d: %s\n", 3, count, key, docpathname);
     free(docpathname);
 }
 
+void countersHelper_findMax(void* arg, const int key, const int count) {
+    countersAndInt_t* info = arg; // case to key
+    if (counters_get(info->counter, *info->intKey) < count) {
+        *info->intKey = key;
+    }
+}
+
 void printScores(counters_t* scores, char* pageDirectory) {
     int numscores = calculateNumbScores(scores);
     if (numscores > 0) {
         printf("Matches %d documents (ranked):\n", numscores);
-        counters_iterate(scores, pageDirectory, countersHelper_printScores);
+        for (int i = 0; i < numscores; i++) {
+            int previousScoreKey = -1;
+            countersAndInt_t info = {scores, &previousScoreKey};
+            counters_iterate(scores, &info, countersHelper_findMax);
+            countersHelper_printScores(pageDirectory, previousScoreKey, counters_get(scores, previousScoreKey));
+            counters_set(scores, previousScoreKey, 0); // set previous max to 0
+        }
     } else {
         printf("No documents match.\n");
     }
