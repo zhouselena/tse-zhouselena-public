@@ -97,7 +97,7 @@ bool counters_set(counters_t* ctrs, const int key, const int count) {
     if (ctrs != NULL && key >=0 && count >=0) {
         if (counters_get(ctrs, key) == 0) {              // if key doesn't alr exist
             counternode_t* insert = new_counternode(key);
-            insert->count = 1;
+            insert->count = count;
             insert->next = ctrs->head;
             ctrs->head = insert;
         } else {                                         // change existing val
