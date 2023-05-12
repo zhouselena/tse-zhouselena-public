@@ -31,9 +31,12 @@ void splitWords(char* query, char** words, int numWords);
 int checkQueryLogic(char** words, int numwords);
 void printCleanedQuery(char** words, int numwords);
 int numDocs(char* pageDirectory);
-void countersHelper_addDocID(void* arg, const int key, const int count);
+void countersHelper_normalAdd(void* arg, const int key, const int count);
 counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdocs);
-
+void countersHelper_calculateNumbScores(void* arg, const int key, const int count);
+int calculateNumbScores(counters_t* scores);
+void countersHelper_printScores(void* arg, const int key, const int count);
+void printScores(counters_t* scores, char* pageDirectory);
 
 /**************** main ****************/
 
@@ -100,7 +103,7 @@ int main(const int argc, char* argv[]) {
         // decide what to print
         int numdocs = numDocs(pageDirectory);
         counters_t* scores = calculateScores(dex, words, numwords, numdocs);
-        counters_print(scores, stdout);
+        printScores(scores, pageDirectory);
 
         free(scores);
         free(cleanedQuery); // frees space
@@ -250,7 +253,7 @@ void printCleanedQuery(char** words, int numwords) {
 /* counts the number of docs in a crawler directory */
 int numDocs(char* pageDirectory) {
     int count = 0;
-    char* docName = calloc(strlen(pageDirectory)+3, sizeof(char));
+    char* docName = calloc(strlen(pageDirectory)+12, sizeof(char));
     int docID = 1;
     sprintf(docName, "%s/%d", pageDirectory, docID);
     FILE* fp;
@@ -263,7 +266,7 @@ int numDocs(char* pageDirectory) {
     return count;
 }
 
-void countersHelper_addDocID(void* arg, const int key, const int count) {
+void countersHelper_normalAdd(void* arg, const int key, const int count) {
     counters_t* scores = arg; // cast arg to scores counter
     counters_set(scores, key, counters_get(scores, key) + count);
 }
@@ -286,10 +289,40 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords, int numdoc
     for (int i = 0; i < numwords; i++) {
 
         counters_t* wordCounter = index_get(dex, words[i]);
-        counters_iterate(wordCounter, scores, countersHelper_addDocID);
+        counters_iterate(wordCounter, scores, countersHelper_normalAdd);
 
     }
 
     return scores;
 
+}
+
+void countersHelper_calculateNumbScores(void* arg, const int key, const int count) {
+    int* numscores = arg; // cast to int pointer
+    *numscores += 1;
+}
+
+int calculateNumbScores(counters_t* scores) {
+    int numscores = 0;
+    counters_iterate(scores, &numscores, countersHelper_calculateNumbScores);
+    return numscores;
+}
+
+void countersHelper_printScores(void* arg, const int key, const int count) {
+    char* pageDirectory = arg; // cast to string
+    char* docpathname = malloc(strlen(pageDirectory) + strlen("/1") + 1 + 1);
+    sprintf(docpathname, "%s/key", pageDirectory);
+    printf("score %*d doc %d: %s\n", 3, key, count, docpathname);
+    free(docpathname);
+}
+
+void printScores(counters_t* scores, char* pageDirectory) {
+    int numscores = calculateNumbScores(scores);
+    if (numscores > 0) {
+        printf("Matches %d documents (ranked):\n", numscores);
+        counters_iterate(scores, pageDirectory, countersHelper_printScores);
+    } else {
+        printf("No documents match.\n");
+    }
+    printf("-----------------------------------------------\n");
 }
