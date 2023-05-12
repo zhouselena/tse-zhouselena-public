@@ -268,6 +268,17 @@ void printCleanedQuery(char** words, int numwords) {
     printf("\n");
 }
 
+void copyCounterHelper(void* arg, const int key, const int count) {
+    counters_t* copyTo = arg; // cast to counters
+    counters_set(copyTo, key, count);
+}
+
+counters_t* copyCounter(counters_t* counter) {
+    counters_t* copyTo = counters_new();
+    counters_iterate(counter, copyTo, copyCounterHelper);
+    return copyTo;
+}
+
 counters_t* calculateScores(index_t* dex, char** words, int numwords) {
 
     /* Returns a counter with all matching docIDs and their scores
@@ -281,7 +292,8 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
      * 
      */
 
-    counters_t* totalScores = index_get(dex, words[0]);
+    // counters_t* totalScores = index_get(dex, words[0]);
+    counters_t* totalScores = copyCounter(index_get(dex, words[0]));
     int totalScoresFree = 0;    // totalScores is initially not malloc'd, free once it is overwritten by a malloc
     int i = 1;
 
@@ -292,7 +304,8 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
             continue;
         } else if (strcmp(words[i], "or") == 0) {
             i++;
-            counters_t* rightTotal = index_get(dex, words[i]);
+            // counters_t* rightTotal = index_get(dex, words[i]);
+            counters_t* rightTotal = copyCounter(index_get(dex, words[i]));
             int freeRightTotal = 0;    // rightTotal is initially not malloc'd, free once it is overwritten by a malloc
             while (((i < numwords-2) && strcmp(words[i+1], "or") != 0)) {      // while haven't reached another OR or end of words, calculates right side
                 if (strcmp(words[i], "and") == 0) {     // skip and
@@ -301,23 +314,26 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
                 }
                 counters_t* currentWord = index_get(dex, words[i]);
                 counters_t* result = wordAndWord(rightTotal, currentWord);
-                if (freeRightTotal == 1) counters_delete(rightTotal);
+                // if (freeRightTotal == 1) counters_delete(rightTotal);
+                counters_delete(rightTotal);
                 rightTotal = result;
                 freeRightTotal = 1;
                 i++;
             }
             counters_t* result = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
-            if (freeRightTotal == 1) { counters_delete(rightTotal); }
-            if (totalScoresFree == 1) { counters_delete(totalScores); }
+            // if (freeRightTotal == 1) { counters_delete(rightTotal); }
+            // if (totalScoresFree == 1) { counters_delete(totalScores); }
+            counters_delete(rightTotal);
+            counters_delete(totalScores);
             totalScores = result;
-            freeRightTotal = 1;
             totalScoresFree = 1;
             i++;
         }
         else {  // normal word without and/or in between, default to and
             counters_t* currentWord = index_get(dex, words[i]);
             counters_t* result = wordAndWord(totalScores, currentWord);
-            if (totalScoresFree == 1) { counters_delete(totalScores); }
+            // if (totalScoresFree == 1) { counters_delete(totalScores); }
+            counters_delete(totalScores);
             totalScores = result;
             totalScoresFree = 1;
             i++;

@@ -1,0 +1,156 @@
+ml () {  module ml "$@"
+}
+module () {  _module_raw "$@" 2>&1
+}
+_module_raw () {  eval `/usr/bin/tclsh8.6 /usr/lib/x86_64-linux-gnu/modulecmd.tcl bash "$@"`;
+ _mlstatus=$?;
+ return $_mlstatus
+}
+#!/bin/bash
+#
+# testing.sh: testing file for 'querier'
+
+# **** Invalid tests **** #
+
+# **** Test with fuzzquery **** #
+
+# local directory
+./fuzzquery ../data/indexer/pgdir-letters-index 10 2 | ./querier ../data/pgdir/letters ../data/indexer/pgdir-letters-index
+./fuzzquery: generating 10 queries from 32 words
+Query: Evaluating query: newsboy
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: e the or for or tse or g e
+Matches 2 documents (ranked):
+score   2 doc 5: ../data/pgdir/letters/5
+score   1 doc 4: ../data/pgdir/letters/4
+-----------------------------------------------
+Query: Evaluating query: eniac coding or playground
+Matches 2 documents (ranked):
+score   1 doc 1: ../data/pgdir/letters/1
+score   1 doc 3: ../data/pgdir/letters/3
+-----------------------------------------------
+Query: Evaluating query: huffman and cs computational b
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: swellest
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: e cs or breadth d or tse b
+Matches 1 documents (ranked):
+score   1 doc 4: ../data/pgdir/letters/4
+-----------------------------------------------
+Query: Evaluating query: transmuting and e
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: dismissals and computational tse or alderwomen or page
+Matches 2 documents (ranked):
+score   1 doc 1: ../data/pgdir/letters/1
+score   1 doc 3: ../data/pgdir/letters/3
+-----------------------------------------------
+Query: Evaluating query: home for and search the the undergoes
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: gearwheel tse and is or sullying tse
+No documents match.
+-----------------------------------------------
+Query: 
+
+# to-scrape
+./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 10 2 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+./fuzzquery: generating 10 queries from 13563 words
+Query: Evaluating query: newsboy
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: trophies aab or seat or rise or homosexuals shoulder
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: heller skip or exemplified
+Matches 1 documents (ranked):
+score   1 doc 158: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/158
+-----------------------------------------------
+Query: Evaluating query: warming and urban conveyed aloud
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: swellest
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: exquisite rising or lower flame or crow scottish
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: transmuting and frederich
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: dismissals and chef longest or alderwomen or masterfully
+Matches 2 documents (ranked):
+score   1 doc 324: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/324
+score   1 doc 243: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/243
+-----------------------------------------------
+Query: Evaluating query: incubated praise and nasa breakfasting heralds undergoes
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: gearwheel leader and boardroom or sullying magdala
+No documents match.
+-----------------------------------------------
+Query: 
+./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 7 4 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+./fuzzquery: generating 7 queries from 13563 words
+Query: Evaluating query: smoke or material
+Matches 6 documents (ranked):
+score   6 doc 297: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/297
+score   3 doc 290: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/290
+score   2 doc 219: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/219
+score   2 doc 166: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/166
+score   1 doc 399: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/399
+score   1 doc 240: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/240
+-----------------------------------------------
+Query: Evaluating query: tinder spray and tenure and brained
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: jacin and paces bizet uncertain
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: coordinate
+Matches 1 documents (ranked):
+score   1 doc 249: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/249
+-----------------------------------------------
+Query: Evaluating query: relentlessly presence or floor
+Matches 11 documents (ranked):
+score   3 doc 94: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/94
+score   2 doc 563: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/563
+score   2 doc 186: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/186
+score   1 doc 359: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/359
+score   1 doc 93: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/93
+score   1 doc 92: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/92
+score   1 doc 91: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/91
+score   1 doc 90: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/90
+score   1 doc 89: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/89
+score   1 doc 88: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/88
+score   1 doc 87: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/87
+-----------------------------------------------
+Query: Evaluating query: master
+Matches 19 documents (ranked):
+score   3 doc 185: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/185
+score   3 doc 385: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/385
+score   3 doc 400: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/400
+score   2 doc 19: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/19
+score   2 doc 171: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/171
+score   2 doc 547: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/547
+score   1 doc 8: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/8
+score   1 doc 48: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/48
+score   1 doc 71: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/71
+score   1 doc 111: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/111
+score   1 doc 134: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/134
+score   1 doc 317: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/317
+score   1 doc 391: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/391
+score   1 doc 423: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/423
+score   1 doc 425: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/425
+score   1 doc 465: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/465
+score   1 doc 467: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/467
+score   1 doc 536: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/536
+score   1 doc 539: /thayerfs/home/f006h51/cs50-dev/shared/tse/output/toscrape-2/539
+-----------------------------------------------
+Query: Evaluating query: hen view murderer or sparring astro and nepal
+No documents match.
+-----------------------------------------------
+Query: 
