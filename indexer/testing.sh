@@ -25,6 +25,6 @@
 
 # Valgrind tests
 
-valgrind ./indextest ../data/pgdir/letters ../data/indexer/pgdir-letters-index
+valgrind ./indexer ../data/pgdir/letters ../data/indexer/pgdir-letters-index
 
-valgrind ./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/it-pgdir-letters-index
+valgrind ./indextest ../data/indexer/pgdir-letters-index ../data/indexer/indextest/IT-pgdir-letters-index
