@@ -64,8 +64,6 @@ int main(const int argc, char* argv[]) {
     // Save index
     index_t* dex = index_new(file_numLines(indexFile));
     index_load(dex, indexFile);
-    FILE* fp = fopen("./testing", "");
-    index_save(dex, fp);
     fclose(indexFile);
     
     // Read queries
@@ -261,6 +259,7 @@ int numDocs(char* pageDirectory) {
         count++;
         docID++;
         sprintf(docName, "%s/%d", pageDirectory, docID);
+        fclose(fp);
     }
     free(docName);
     return count;
@@ -310,9 +309,9 @@ int calculateNumbScores(counters_t* scores) {
 
 void countersHelper_printScores(void* arg, const int key, const int count) {
     char* pageDirectory = arg; // cast to string
-    char* docpathname = malloc(strlen(pageDirectory) + strlen("/1") + 1 + 1);
-    sprintf(docpathname, "%s/key", pageDirectory);
-    printf("score %*d doc %d: %s\n", 3, key, count, docpathname);
+    char* docpathname = malloc(strlen(pageDirectory) + 12);
+    sprintf(docpathname, "%s/%d", pageDirectory, key);
+    printf("score %*d doc %d: %s\n", 3, count, key, docpathname);
     free(docpathname);
 }
 
