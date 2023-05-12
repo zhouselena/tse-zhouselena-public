@@ -149,7 +149,7 @@ char* cleanQuery(char* word) {
         }
 
         else if (!isalpha(word[i])) {    // encountering a non-alpha character
-            printf("Error: bad character '%c' in query.\n", word[i]);
+            fprintf(stderr, "Error: bad character '%c' in query.\n", word[i]);
             free(cleanWord);
             return NULL;
         }
@@ -162,7 +162,7 @@ char* cleanQuery(char* word) {
     }
 
     if (numbWhiteSpaces == strlen(word)) {
-        printf("Error: empty query.\n");
+        fprintf(stderr, "Error: empty query.\n");
         free(cleanWord);
         return NULL;
     }
@@ -219,13 +219,13 @@ int checkQueryLogic(char** words, int numwords) {
 
     // first word can't be and/or
     if (strcmp(words[0], "and") == 0 || strcmp(words[0], "or") == 0) {
-        printf("Error: '%s' cannot be first\n", words[0]);
+        fprintf(stderr, "Error: '%s' cannot be first\n", words[0]);
         return 1;
     }
     
     // last word can't be and/or
     if (strcmp(words[numwords-1], "and") == 0 || strcmp(words[numwords-1], "or") == 0) {
-        printf("Error: '%s' cannot be last\n", words[numwords-1]);
+        fprintf(stderr, "Error: '%s' cannot be last\n", words[numwords-1]);
         return 1;
     }
 
@@ -235,7 +235,7 @@ int checkQueryLogic(char** words, int numwords) {
         if (strcmp(words[i], "and") == 0 || strcmp(words[i], "or") == 0) {
             // if previous word was also and/or
             if (strcmp(words[i-1], "and") == 0 || strcmp(words[i-1], "or") == 0 ) {
-                printf("Error: '%s' and '%s' cannot be adjacent\n", words[i-1], words[i]);
+                fprintf(stderr, "Error: '%s' and '%s' cannot be adjacent\n", words[i-1], words[i]);
                 return 1;
             }
         }
@@ -271,6 +271,7 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
      */
 
     counters_t* totalScores = index_get(dex, words[0]);
+    int totalScoresFree = 0;    // totalScores is initially not malloc'd, free once it is overwritten by a malloc
     int i = 1;
 
     while (i < numwords) {
@@ -281,29 +282,37 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
         } else if (strcmp(words[i], "or") == 0) {
             i++;
             counters_t* rightTotal = index_get(dex, words[i]);
-            int freeRightTotal = 0;
+            int freeRightTotal = 0;    // rightTotal is initially not malloc'd, free once it is overwritten by a malloc
             while (((i < numwords-2) && strcmp(words[i+1], "or") != 0)) {      // while haven't reached another OR or end of words, calculates right side
                 if (strcmp(words[i], "and") == 0) {     // skip and
                     i++;
                     continue;
                 }
                 counters_t* currentWord = index_get(dex, words[i]);
-                rightTotal = wordAndWord(rightTotal, currentWord);
+                counters_t* result = wordAndWord(rightTotal, currentWord);
+                if (freeRightTotal == 1) counters_delete(rightTotal);
+                rightTotal = result;
                 freeRightTotal = 1;
                 i++;
             }
-            totalScores = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
-            if (freeRightTotal == 1) counters_delete(rightTotal);
+            counters_t* result = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
+            if (freeRightTotal == 1) {
+                counters_delete(rightTotal);
+            }
+            totalScores = result;
+            freeRightTotal = 1;
             i++;
         }
         else {  // normal word without and/or in between, default to and
             counters_t* currentWord = index_get(dex, words[i]);
-            totalScores = wordAndWord(totalScores, currentWord);
+            counters_t* result = wordAndWord(totalScores, currentWord);
+            if (totalScoresFree == 1) {
+                counters_delete(totalScores);
+            }
+            totalScores = result;
+            totalScoresFree = 1;
             i++;
         }
-
-        // counters_t* wordCounter = index_get(dex, words[i]);
-        // counters_iterate(wordCounter, totalScores, countersHelper_normalAdd);
 
     }
 
