@@ -34,3 +34,4 @@ clean:
 	rm -f ~* *.o
 	rm -f querier
 	rm -f core
+	rm -f vgcore.*
