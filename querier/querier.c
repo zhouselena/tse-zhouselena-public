@@ -38,22 +38,30 @@ typedef struct countersAndInt { // for counter_iterate w multiple counters
 /**************** function declarations ****************/
 
 /* formatting query */
+
 char* cleanQuery(char* word);
-int numWords(char* query);
 void splitWords(char* query, char** words, int numWords);
+int numWords(char* query);
 int checkQueryLogic(char** words, int numwords);
 void printCleanedQuery(char** words, int numwords);
 
-void countersHelper_normalAdd(void* arg, const int key, const int count);
+/* calculating doc scores */
+
 counters_t* calculateScores(index_t* dex, char** words, int numwords);
-void countersHelper_calculateNumbScores(void* arg, const int key, const int count);
-int calculateNumbScores(counters_t* scores);
-void countersHelper_printScores(char* pageDirectory, const int key, const int count);
-void printScores(counters_t* scores, char* pageDirectory);
-void countersHelper_wordAndWord(void* arg, const int key, const int count);
+counters_t* copyCounter(counters_t* counter);
 counters_t* wordAndWord(counters_t* firstWord, counters_t* secondWord);
 counters_t* wordOrWord(counters_t* firstWord, counters_t* secondWord);
+int calculateNumbScores(counters_t* scores);
+void printScores(counters_t* scores, char* pageDirectory);
+
+/* iterator helper functions */
+
+void copyCounterHelper(void* arg, const int key, const int count);
+void countersHelper_wordAndWord(void* arg, const int key, const int count);
+void countersHelper_wordOrWord(void* arg, const int key, const int count);
+void countersHelper_calculateNumbScores(void* arg, const int key, const int count);
 void countersHelper_findMax(void* arg, const int key, const int count);
+void countersHelper_printScores(char* pageDirectory, const int key, const int count);
 
 /**************** main ****************/
 
@@ -136,6 +144,8 @@ int main(const int argc, char* argv[]) {
 
 /**************** functions ****************/
 
+/**************** formatting query ****************/
+
 /* cleanQuery */
 /* Takes in a char* word, and removes extra whitespaces or non-alpha characters and 
  * normalizes the word.
@@ -182,17 +192,6 @@ char* cleanQuery(char* word) {
 
 }
 
-/* numWords */
-/* Takes a cleaned and safe query and returns the number of words in the query.
- */
-int numWords(char* query) {
-    int numWords = 1; // num words = num spaces + 1
-    for (int i = 0; i < strlen(query); i++) {
-        if (isspace(query[i])) numWords++;
-    }
-    return numWords;
-}
-
 /* splitWords */
 /* Takes a cleaned and safe query and splits into an array of words.
  */
@@ -219,6 +218,17 @@ void splitWords(char* query, char** words, int numWords) {
 
     }
 
+}
+
+/* numWords */
+/* Takes a cleaned and safe query and returns the number of words in the query.
+ */
+int numWords(char* query) {
+    int numWords = 1; // num words = num spaces + 1
+    for (int i = 0; i < strlen(query); i++) {
+        if (isspace(query[i])) numWords++;
+    }
+    return numWords;
 }
 
 /* checkQueryLogic */
@@ -268,33 +278,21 @@ void printCleanedQuery(char** words, int numwords) {
     printf("\n");
 }
 
-void copyCounterHelper(void* arg, const int key, const int count) {
-    counters_t* copyTo = arg; // cast to counters
-    counters_set(copyTo, key, count);
-}
+/**************** calculating doc scores ****************/
 
-counters_t* copyCounter(counters_t* counter) {
-    counters_t* copyTo = counters_new();
-    counters_iterate(counter, copyTo, copyCounterHelper);
-    return copyTo;
-}
+/* calculateScores */
+/* Given an index and array of words, calculates the score of all matching docs.
+ * Calculates based on word precedence.
+ *  If no and/or present, takes the intersection.
+ *  If and present, skips and and takes the intersection.
+ *  If or present, calculates right side total with precedence and adds to overall total.
+ * Returns a NEWLY MALLOC'd counter set of docIDs and scores.
+ * USER MUST FREE
+ */
 
 counters_t* calculateScores(index_t* dex, char** words, int numwords) {
 
-    /* Returns a counter with all matching docIDs and their scores
-     * 
-     * Scoring:
-     * Get all counters of one word
-     * Iterate over each docID and add the docID + score to the counter # figure out how to do and/or
-     * Do this for each word
-     * 
-     * Ranking:
-     * 
-     */
-
-    // counters_t* totalScores = index_get(dex, words[0]);
     counters_t* totalScores = copyCounter(index_get(dex, words[0]));
-    int totalScoresFree = 0;    // totalScores is initially not malloc'd, free once it is overwritten by a malloc
     int i = 1;
 
     while (i < numwords) {
@@ -304,9 +302,7 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
             continue;
         } else if (strcmp(words[i], "or") == 0) {
             i++;
-            // counters_t* rightTotal = index_get(dex, words[i]);
             counters_t* rightTotal = copyCounter(index_get(dex, words[i]));
-            int freeRightTotal = 0;    // rightTotal is initially not malloc'd, free once it is overwritten by a malloc
             while (((i < numwords-2) && strcmp(words[i+1], "or") != 0)) {      // while haven't reached another OR or end of words, calculates right side
                 if (strcmp(words[i], "and") == 0) {     // skip and
                     i++;
@@ -314,28 +310,21 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
                 }
                 counters_t* currentWord = index_get(dex, words[i]);
                 counters_t* result = wordAndWord(rightTotal, currentWord);
-                // if (freeRightTotal == 1) counters_delete(rightTotal);
                 counters_delete(rightTotal);
                 rightTotal = result;
-                freeRightTotal = 1;
                 i++;
             }
             counters_t* result = wordOrWord(totalScores, rightTotal); // once reached end or next OR, add right total to total
-            // if (freeRightTotal == 1) { counters_delete(rightTotal); }
-            // if (totalScoresFree == 1) { counters_delete(totalScores); }
             counters_delete(rightTotal);
             counters_delete(totalScores);
             totalScores = result;
-            totalScoresFree = 1;
             i++;
         }
         else {  // normal word without and/or in between, default to and
             counters_t* currentWord = index_get(dex, words[i]);
             counters_t* result = wordAndWord(totalScores, currentWord);
-            // if (totalScoresFree == 1) { counters_delete(totalScores); }
             counters_delete(totalScores);
             totalScores = result;
-            totalScoresFree = 1;
             i++;
         }
 
@@ -345,18 +334,20 @@ counters_t* calculateScores(index_t* dex, char** words, int numwords) {
 
 }
 
-void countersHelper_wordAndWord(void* arg, const int key, const int count) {
-    twoCounters_t* secondAndResult = arg; // cast to two counters
-    int secondCount = counters_get(secondAndResult->second, key);
-    if (secondCount > 0) {          // if docID exists in second word
-        if (secondCount < count) {  // if there is less count in second word
-            counters_set(secondAndResult->first, key, secondCount);
-        } else {
-            counters_set(secondAndResult->first, key, count);
-        }
-    }
+/* copyCounters */
+/* Creates a clean copy of a counter set for safe free'ing.
+ */
+counters_t* copyCounter(counters_t* counter) {
+    counters_t* copyTo = counters_new();
+    counters_iterate(counter, copyTo, copyCounterHelper);
+    return copyTo;
 }
 
+/* wordAndWord */
+/* Given two counter sets, returns the intersection of the two sets.
+ * Returns a new malloc'd counterset.
+ * USER NEEDS TO FREE
+ */
 counters_t* wordAndWord(counters_t* firstWord, counters_t* secondWord) {
     counters_t* and = counters_new();
     twoCounters_t secondAndResult = {and, secondWord};
@@ -364,44 +355,33 @@ counters_t* wordAndWord(counters_t* firstWord, counters_t* secondWord) {
     return and;
 }
 
-void countersHelper_normalAdd(void* arg, const int key, const int count) {
-    counters_t* scores = arg; // cast arg to scores counter
-    counters_set(scores, key, counters_get(scores, key) + count);   // will not duplicate scores but rather add on top
-}
-
+/* wordOrWord */
+/* Given two counter sets, returns the union of the two sets.
+ * Returns a new malloc'd counterset.
+ * USER NEEDS TO FREE
+ */
 counters_t* wordOrWord(counters_t* firstWord, counters_t* secondWord) {
     counters_t* or = counters_new();
     if (or == NULL) return NULL;
-    counters_iterate(firstWord, or, countersHelper_normalAdd);
-    counters_iterate(secondWord, or, countersHelper_normalAdd);
+    counters_iterate(firstWord, or, countersHelper_wordOrWord);
+    counters_iterate(secondWord, or, countersHelper_wordOrWord);
     return or;
 }
 
-void countersHelper_calculateNumbScores(void* arg, const int key, const int count) {
-    int* numscores = arg; // cast to int pointer
-    *numscores += 1;
-}
-
+/* calculateNumbScores */
+/* Given a counterset, counts how many items the counterset stores.
+ * Used to determine whether to print a "no docs match" output.
+ * Returns count.
+ */
 int calculateNumbScores(counters_t* scores) {
     int numscores = 0;
     counters_iterate(scores, &numscores, countersHelper_calculateNumbScores);
     return numscores;
 }
 
-void countersHelper_printScores(char* pageDirectory, const int key, const int count) {
-    char* docpathname = malloc(strlen(pageDirectory) + 12);
-    sprintf(docpathname, "%s/%d", pageDirectory, key);
-    printf("score %*d doc %d: %s\n", 3, count, key, docpathname);
-    free(docpathname);
-}
-
-void countersHelper_findMax(void* arg, const int key, const int count) {
-    countersAndInt_t* info = arg; // case to key
-    if (counters_get(info->counter, *info->intKey) < count) {
-        *info->intKey = key;
-    }
-}
-
+/* printScores */
+/* Prints scores of all matching docs in ranked descending order.
+ */
 void printScores(counters_t* scores, char* pageDirectory) {
     int numscores = calculateNumbScores(scores);
     if (numscores > 0) {
@@ -417,4 +397,76 @@ void printScores(counters_t* scores, char* pageDirectory) {
         printf("No documents match.\n");
     }
     printf("-----------------------------------------------\n");
+}
+
+/**************** iterator helper functions ****************/
+
+/* copyCounterHelper */
+/* Helper function for copyCounter.
+ * Adds counter to new counter set.
+ */
+void copyCounterHelper(void* arg, const int key, const int count) {
+    counters_t* copyTo = arg; // cast to counters
+    counters_set(copyTo, key, count);
+}
+
+/* countersHelper_wordAndWord */
+/* Helper function for wordAndWord.
+ * Determines whether docID has a second word,
+ * then sets score to the minimum of the two scores..
+ */
+void countersHelper_wordAndWord(void* arg, const int key, const int count) {
+    twoCounters_t* secondAndResult = arg; // cast to two counters
+    int secondCount = counters_get(secondAndResult->second, key);
+    if (secondCount > 0) {          // if docID exists in second word
+        if (secondCount < count) {  // if there is less count in second word
+            counters_set(secondAndResult->first, key, secondCount);
+        } else {
+            counters_set(secondAndResult->first, key, count);
+        }
+    }
+}
+
+/* countersHelper_wordOrWord */
+/* Helper function for wordOrWord.
+ * Adds counter to overall scores without duplicating docIDs.
+ */
+void countersHelper_wordOrWord(void* arg, const int key, const int count) {
+    counters_t* scores = arg; // cast arg to scores counter
+    counters_set(scores, key, counters_get(scores, key) + count);   // will not duplicate scores but rather add on top
+}
+
+/* countersHelper_calculateNumbScores */
+/* Helper function for calculateNumbScores.
+ * Adds 1 to numscores.
+ */
+void countersHelper_calculateNumbScores(void* arg, const int key, const int count) {
+    int* numscores = arg; // cast to int pointer
+    *numscores += 1;
+}
+
+/* countersHelper_findMax */
+/* Helper function for printScores.
+ * If the count is larger, replaces the max counter.
+ */
+void countersHelper_findMax(void* arg, const int key, const int count) {
+    countersAndInt_t* info = arg; // case to key
+    if (counters_get(info->counter, *info->intKey) < count) {
+        *info->intKey = key;
+    }
+}
+
+/* countersHelper_printScores */
+/* Helper function for printScores.
+ * Prints the score and URL of the counter.
+ */
+void countersHelper_printScores(char* pageDirectory, const int key, const int count) {
+    char* docpathname = malloc(strlen(pageDirectory) + 12);
+    sprintf(docpathname, "%s/%d", pageDirectory, key);
+    FILE* doc = fopen(docpathname, "r");
+    char* URL = file_readLine(doc);
+    printf("score %3d doc %3d: %s\n", count, key, URL);
+    free(docpathname);
+    fclose(doc);
+    free(URL);
 }
