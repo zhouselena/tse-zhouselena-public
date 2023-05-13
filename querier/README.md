@@ -25,17 +25,17 @@ Run `./querier pageDirectory indexFilename` where `pageDirectory` is a crawler-m
 * exit(2): invalid page directory or indexFileName, caught in main
 * exit(3): empty index file, caught in main
 
-### Assumptions
-`querier` assumes that documents in the pageDirectory follow the pattern of ../pageDirectory/\[docID] starting at doc ID of 1 and no missing numbers in between.
-
-`testing.sh` refers to local directories which are assumed to exist.
-
 ### Functionalities implemented
 
 * prints set of documents that contains all words in the query
 * supports 'and' and 'or' operators WITH precedence
 * prints document set in decreasing order by score
 Meets full specs.
+
+### Assumptions
+`querier` assumes that documents in the pageDirectory follow the pattern of ../pageDirectory/\[docID] starting at doc ID of 1 and no missing numbers in between.
+
+`testing.sh` refers to local directories which are assumed to exist.
 
 ### Files:
 * `.gitignore`: will ignore querier and core dumps
