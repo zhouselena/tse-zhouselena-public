@@ -23,7 +23,7 @@ See that directory for more detailed module interfaces.
 
 The `main` function validates the arguments, processes each query until user quits, finds the websites that match each query, and prints it out for the user to see.
 
-`main` calls `cleanQuery` and `splitWords` to process the query.
+`main` calls `cleanQuery`, `splitWords`, and `checkQueryLogic` to process the query.
 
 `main` calls `calculateScores` to return a counter set of all matching documents, and `printScores` to print each matching doc in ranked order.
 
@@ -34,6 +34,10 @@ The `cleanQuery` function takes a line and normalizes it, returning a normalized
 ### splitWords
 
 The `splitWords` function takes a clean query line and splits it into an array of words. It assigns a start and end pointer to the query line and moves the end pointer until a whitespace is reached, then adds that word to the array.
+
+### checkQueryLogic
+
+The `checkQueryLogic` function takes an array of strings and determines whether or not there are any starting, ending, or adjacent "and/or" words. If there are, it prints an error message to stderr and returns 1 (false).
 
 ### calculateScores
 
