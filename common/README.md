@@ -11,3 +11,7 @@ To make, run `make` in terminal.
 * `Makefile`: makes terminal by running command `make` in terminal.
 * `pagedir.h`: header file for pagedir module.
 * `pagedir.c`: implementation of pagedir module.
+* `index.h`: header file for index module.
+* `index.c`: implementation of index module.
+* `word.h`: header file for word module.
+* `word.c`: implemenation of word module.
