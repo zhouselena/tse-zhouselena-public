@@ -40,11 +40,11 @@ test: testing.sh
 # valgrind: querier
 # 	$(VALGRIND) ./fuzzquery ../data/indexer/pgdir-letters-index 10 2 | ./querier ../data/pgdir/letters ../data/indexer/pgdir-letters-index
 
-# valgrind: querier
-# 	$(VALGRIND) ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 7 4 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
-
 valgrind: querier
-	$(VALGRIND) ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+	$(VALGRIND) ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 7 4 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+
+# valgrind: querier
+# 	$(VALGRIND) ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
 
 clean:
 	rm -rf *.dSYM  # MacOS debugger info
