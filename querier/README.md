@@ -40,6 +40,8 @@ Meets full specs.
 ### Files:
 * `.gitignore`: will ignore querier and core dumps
 * `Makefile`: makes terminal by running command `make` in terminal.
-* `querier.c`: querier file, implementation details written in IMPLEMENTATION.md and design details written in DESIGN.md
+* `querier.c`: querier file
+* `IMPLEMENTATION.md`: implementation specifications
+* `DESIGN.md`: design specifications
 * `testing.sh`: testing file
 * `testing.out`: testing output file
