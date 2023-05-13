@@ -1,3 +1,7 @@
+******************
+* EXTENSION USED *
+******************
+
 # CS50 TSE
 ## Selena Zhou (zhouselena)
 
