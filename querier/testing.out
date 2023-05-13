@@ -12,9 +12,34 @@ _module_raw () {  eval `/usr/bin/tclsh8.6 /usr/lib/x86_64-linux-gnu/modulecmd.tc
 
 # **** Invalid tests **** #
 
-# **** Test with fuzzquery **** #
+# Incorrect number of arguments
+./querier
+Usage: ./querier pageDirectory indexFilename
+./querier ../data/pgdir/letters
+Usage: ./querier pageDirectory indexFilename
+./querier ../data/pgdir/letters ../data/indexer/pgdir-letters-index extrainput
+Usage: ./querier pageDirectory indexFilename
+
+# Wrong page directory
+./querier wrong_page_directory ../data/indexer/pgdir-letters-index
+Error: not a crawler directory, no pageDirectory/.crawler file
+Failed pagedir_validate
+./querier ../common ../data/indexer/pgdir-letters-index
+Error: not a crawler directory, no pageDirectory/.crawler file
+Failed pagedir_validate
+
+# Wrong index file
+./querier ../data/pgdir/letters wrong_index_file
+Unable to open index file
+
+# Empty index file
+./querier ../data/pgdir/letters ../data/indexer/broken
+Error loading index.
+
+# **** Valid tests with fuzzquery **** #
 
 # local directory
+
 ./fuzzquery ../data/indexer/pgdir-letters-index 10 2 | ./querier ../data/pgdir/letters ../data/indexer/pgdir-letters-index
 ./fuzzquery: generating 10 queries from 32 words
 Query: Evaluating query: newsboy
@@ -56,7 +81,56 @@ No documents match.
 -----------------------------------------------
 Query: 
 
-# to-scrape
+./fuzzquery ../data/indexer/wikipedia_2-index 8 99 | ./querier ../data/pgdir/wikipedia ../data/indexer/wikipedia_2-index
+./fuzzquery: generating 8 queries from 46 words
+Query: Evaluating query: college
+Matches 1 documents (ranked):
+score   1 doc 1: ../data/pgdir/wikipedia/1
+-----------------------------------------------
+Query: Evaluating query: computer and brawled
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: available and open
+Matches 1 documents (ranked):
+score   1 doc 1: ../data/pgdir/wikipedia/1
+-----------------------------------------------
+Query: Evaluating query: contributors
+Matches 1 documents (ranked):
+score   1 doc 1: ../data/pgdir/wikipedia/1
+-----------------------------------------------
+Query: Evaluating query: index and computer source
+Matches 1 documents (ranked):
+score   1 doc 1: ../data/pgdir/wikipedia/1
+-----------------------------------------------
+Query: Evaluating query: browser index possessors and middot the
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: obscurest
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: cindered trucker and contributors source or made index
+Matches 1 documents (ranked):
+score   1 doc 1: ../data/pgdir/wikipedia/1
+-----------------------------------------------
+Query: 
+
+./fuzzquery ../data/indexer/toscrape-1-index 3 1 | ./querier ../data/pgdir/toscrape ../data/indexer/toscrape-1-index
+./fuzzquery: generating 3 queries from 2404 words
+Query: Evaluating query: sharp and stay
+Matches 1 documents (ranked):
+score   2 doc 19: ../data/pgdir/toscrape/19
+-----------------------------------------------
+Query: Evaluating query: english or green others or gita means
+No documents match.
+-----------------------------------------------
+Query: Evaluating query: houdini fragment or freedom
+Matches 1 documents (ranked):
+score   1 doc 15: ../data/pgdir/toscrape/15
+-----------------------------------------------
+Query: 
+
+# cs50 output - toscrape
+
 ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 10 2 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
 ./fuzzquery: generating 10 queries from 13563 words
 Query: Evaluating query: newsboy
@@ -93,6 +167,7 @@ Query: Evaluating query: gearwheel leader and boardroom or sullying magdala
 No documents match.
 -----------------------------------------------
 Query: 
+
 ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 7 4 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
 ./fuzzquery: generating 7 queries from 13563 words
 Query: Evaluating query: smoke or material
