@@ -30,6 +30,7 @@ Run `./querier pageDirectory indexFilename` where `pageDirectory` is a crawler-m
 * prints set of documents that contains all words in the query
 * supports 'and' and 'or' operators WITH precedence
 * prints document set in decreasing order by score
+
 Meets full specs.
 
 ### Assumptions
