@@ -34,3 +34,9 @@
 ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 10 2 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
 
 ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 7 4 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
+
+# **** Valgrind tests to ensure no memory leaks **** #
+
+valgrind ./fuzzquery ../data/indexer/pgdir-letters-index 10 2 | ./querier ../data/pgdir/letters ../data/indexer/pgdir-letters-index
+
+valgrind ./fuzzquery ~/cs50-dev/shared/tse/output/toscrape-2.index 7 4 | ./querier ~/cs50-dev/shared/tse/output/toscrape-2 ~/cs50-dev/shared/tse/output/toscrape-2.index
