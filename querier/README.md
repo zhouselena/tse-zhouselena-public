@@ -11,7 +11,9 @@ According to the Querier Requirements Spec, the TSE Querier is a standalone prog
 
 ### Compilation
 To make `querier`, run `make` in terminal.
+
 To test valgrind, run `make valgrind` in terminal.
+
 To test with `testing.sh`, run `make test` in terminal.
 
 ### Usage
@@ -25,6 +27,7 @@ Run `./querier pageDirectory indexFilename` where `pageDirectory` is a crawler-m
 
 ### Assumptions
 `querier` assumes that documents in the pageDirectory follow the pattern of ../pageDirectory/\[docID] starting at doc ID of 1 and no missing numbers in between.
+
 `testing.sh` refers to local directories which are assumed to exist.
 
 ### Files:
